@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Complaint #{{ complaint.complaintid }} - Maintenance{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>🔧 Complaint Details</h2>
+    <hr>
+    
+    <div class="row">
+        <!-- Left Column: Complaint Info -->
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5>Complaint Information</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>ID:</strong> #{{ complaint.complaintid }}</p>
+                    <p><strong>Student:</strong> {{ complaint.student.fullname }}</p>
+                    <p><strong>Category:</strong> {{ complaint.category }}</p>
+                    <p><strong>Priority:</strong> 
+                        <span class="badge {% if complaint.priority == 'High' %}bg-danger{% elif complaint.priority == 'Medium' %}bg-warning{% else %}bg-success{% endif %}">
+                            {{ complaint.priority }}
+                        </span>
+                    </p>
+                    <p><strong>Status:</strong> 
+                        <span class="badge {% if complaint.status == 'resolved' %}bg-success{% elif complaint.status == 'in_progress' %}bg-info{% elif complaint.status == 'assigned' %}bg-warning{% else %}bg-secondary{% endif %}">
+                            {{ complaint.status.replace('_', ' ').title() }}
+                        </span>
+                    </p>
+                    <p><strong>Submitted:</strong> {{ complaint.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                    {% if complaint.resolvedat %}
+                    <p><strong>Resolved At:</strong> {{ complaint.resolvedat.strftime('%Y-%m-%d %H:%M') }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Description -->
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5>Description</h5>
+                </div>
+                <div class="card-body">
+                    <p>{{ complaint.description }}</p>
+                    {% if complaint.location %}
+                    <p><strong>Location:</strong> {{ complaint.location }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Status Form -->
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5>Update Complaint Status</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('maintenance.update_status', id=complaint.complaintid) }}">
+                <div class="mb-3">
+                    <label class="form-label"><strong>Update Status:</strong></label>
+                    <select name="status" class="form-select" required>
+                        <option value="">-- Select Status --</option>
+                        <option value="assigned" {% if complaint.status == 'assigned' %}selected{% endif %}>📋 Assigned</option>
+                        <option value="in_progress" {% if complaint.status == 'in_progress' %}selected{% endif %}>🔨 In Progress</option>
+                        <option value="resolved" {% if complaint.status == 'resolved' %}selected{% endif %}>✅ Resolved</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label"><strong>Resolution Notes:</strong></label>
+                    <textarea name="resolution_notes" class="form-control" rows="3" placeholder="Add notes about resolution...">{{ complaint.resolutionnotes or '' }}</textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-100">💾 Update Status</button>
+            </form>
+        </div>
+    </div>
+
+    <a href="{{ url_for('maintenance.complaints') }}" class="btn btn-secondary mt-3">← Back to Complaints</a>
+</div>
+{% endblock %}

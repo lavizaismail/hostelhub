@@ -1,0 +1,45 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# Database files (LOCAL ONLY)
+*.db
+*.sqlite
+*.sqlite3
+
+# Instance folder (contains local database)
+instance/
+
+# Backup folder (contains old database backups)
+backup/
+backups/
+
+# Uploads folder (user uploaded files)
+uploads/
+static/uploads/
+!static/uploads/.gitkeep
+
+# Environment variables
+.env
+.env.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

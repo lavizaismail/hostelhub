@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+{% block title %}Lodge Complaint - HostelHub{% endblock %}
+
+{% block content %}
+<h1 class="page-title animate__animated animate__fadeInDown">🔧 Lodge a Complaint</h1>
+
+{% if not allocation %}
+<div class="info-banner warning-banner">
+  <p>⚠️ <strong>Your room request is pending approval.</strong> You can only lodge complaints about general hostel areas (not room-specific issues).</p>
+</div>
+{% endif %}
+
+<div class="card animate__animated animate__fadeInUp">
+  
+  <form method="POST" enctype="multipart/form-data" class="complaint-form" id="complaintForm">
+    
+    <!-- Complaint Type Selection -->
+    <div class="form-group">
+      <label class="form-label">Complaint Location Type <span class="text-danger">*</span></label>
+      <div class="radio-group">
+        
+        <!-- Room-specific option -->
+        <label class="radio-option {% if not allocation %}disabled{% endif %}">
+          <input type="radio" name="complaint_type" value="room" 
+                 {% if allocation %}checked{% else %}disabled{% endif %} 
+                 onchange="toggleLocation()">
+          <div class="radio-content">
+            <span class="radio-icon">🏠</span>
+            <span class="radio-text">My Room</span>
+            {% if not allocation %}
+            <small class="text-danger">(Room not allocated yet)</small>
+            {% endif %}
+          </div>
+        </label>
+        
+        <!-- General area option -->
+        <label class="radio-option">
+          <input type="radio" name="complaint_type" value="general" 
+                 {% if not allocation %}checked{% endif %} 
+                 onchange="toggleLocation()">
+          <div class="radio-content">
+            <span class="radio-icon">🏢</span>
+            <span class="radio-text">General Hostel Area</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Room Info (shown only for room-specific) -->
+    {% if allocation %}
+    <div class="room-info-box" id="roomInfo">
+      <h3>📍 Your Allocated Room</h3>
+      <div class="room-details">
+        <p><strong>Block:</strong> {{ allocation.room.block }}</p>
+        <p><strong>Room Number:</strong> {{ allocation.room.roomnumber }}</p>
+        <p><strong>Floor:</strong> {{ allocation.room.floor }}</p>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Location Field (for general complaints) -->
+    <div class="form-group" id="locationField" {% if allocation %}style="display: none;"{% endif %}>
+      <label for="location" class="form-label">Complaint Location <span class="text-danger">*</span></label>
+      <input type="text" id="location" name="location" class="form-control" 
+             placeholder="e.g., Common Room, Mess Hall, Ground Floor Corridor, Parking Area, Garden">
+      <small class="form-text">Specify the exact location of the problem</small>
+    </div>
+
+    <div class="form-group">
+      <label for="title" class="form-label">Complaint Title <span class="text-danger">*</span></label>
+      <input type="text" id="title" name="title" class="form-control" 
+             placeholder="e.g., Broken AC, Leaking Tap, Faulty Light" required maxlength="100">
+    </div>
+
+    <div class="form-group">
+      <label for="category" class="form-label">Category <span class="text-danger">*</span></label>
+      <select id="category" name="category" class="form-control" required>
+        <option value="">-- Select Category --</option>
+        <option value="plumbing">🚰 Plumbing</option>
+        <option value="electrical">⚡ Electrical</option>
+        <option value="cleaning">🧹 Cleaning</option>
+        <option value="wifi">📶 Wi-Fi/Internet</option>
+        <option value="furniture">🪑 Furniture</option>
+        <option value="other">📋 Other</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="priority" class="form-label">Priority Level <span class="text-danger">*</span></label>
+      <select id="priority" name="priority" class="form-control" required>
+        <option value="low">🟢 Low - Can wait a few days</option>
+        <option value="medium" selected>🟡 Medium - Normal priority</option>
+        <option value="high">🟠 High - Needs quick attention</option>
+        <option value="urgent">🔴 Urgent - Immediate action required</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="description" class="form-label">Detailed Description <span class="text-danger">*</span></label>
+      <textarea id="description" name="description" rows="6" class="form-control" 
+                placeholder="Describe the issue in detail. Include when it started, how it affects you, etc." required></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="attachment" class="form-label">Attachment (Optional)</label>
+      <input type="file" id="attachment" name="attachment" class="form-control" 
+             accept="image/*,.pdf" onchange="previewAttachment(this)">
+      <small class="form-text">Upload a photo or document (max 5MB, formats: JPG, PNG, PDF)</small>
+      
+      <!-- Image Preview -->
+      <div id="imagePreview" style="display: none; margin-top: 1rem;">
+        <img id="previewImg" src="" alt="Preview" style="max-width: 300px; max-height: 200px; border-radius: 8px; border: 2px solid var(--border-color);">
+        <button type="button" class="btn btn-sm btn-danger" onclick="removeAttachment()" style="margin-left: 1rem;">Remove</button>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">📤 Submit Complaint</button>
+      <a href="{{ url_for('student.dashboard') }}" class="btn btn-secondary">← Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.warning-banner {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.1));
+  border-left-color: var(--warning-color);
+}
+
+.radio-option.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.radio-option.disabled .radio-content {
+  cursor: not-allowed;
+}
+
+.info-banner {
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.08), rgba(139, 92, 246, 0.08));
+  padding: 1.25rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  border-left: 4px solid var(--primary-color);
+}
+
+.info-banner p {
+  margin: 0;
+  font-size: 1.0625rem;
+}
+
+.radio-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.radio-option {
+  cursor: pointer;
+}
+
+.radio-option input[type="radio"] {
+  display: none;
+}
+
+.radio-content {
+  padding: 1.25rem;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  text-align: center;
+  transition: all 0.3s ease;
+  background: var(--surface-color);
+}
+
+.radio-option input:checked + .radio-content {
+  border-color: var(--primary-color);
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.08), rgba(139, 92, 246, 0.08));
+}
+
+.radio-option input:disabled + .radio-content {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.radio-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.radio-text {
+  display: block;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.room-info-box {
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.08), rgba(139, 92, 246, 0.08));
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  border-left: 4px solid var(--primary-color);
+}
+
+.room-info-box h3 {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+  font-size: 1.125rem;
+}
+
+.room-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+}
+
+.room-details p {
+  margin: 0;
+  padding: 0.625rem;
+  background: var(--surface-color);
+  border-radius: 8px;
+  font-size: 0.9375rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleLocation() {
+  const roomRadio = document.querySelector('input[name="complaint_type"][value="room"]');
+  const generalRadio = document.querySelector('input[name="complaint_type"][value="general"]');
+  const roomInfo = document.getElementById('roomInfo');
+  const locationField = document.getElementById('locationField');
+  const locationInput = document.getElementById('location');
+  
+  if (generalRadio && generalRadio.checked) {
+    if (roomInfo) roomInfo.style.display = 'none';
+    locationField.style.display = 'block';
+    locationInput.required = true;
+  } else {
+    if (roomInfo) roomInfo.style.display = 'block';
+    locationField.style.display = 'none';
+    locationInput.required = false;
+  }
+}
+
+function previewAttachment(input) {
+  const preview = document.getElementById('imagePreview');
+  const previewImg = document.getElementById('previewImg');
+  
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    
+    // Check file size
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size must be less than 5MB');
+      input.value = '';
+      return;
+    }
+    
+    // Show preview for images
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        previewImg.src = e.target.result;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    } else {
+      preview.style.display = 'none';
+    }
+  }
+}
+
+function removeAttachment() {
+  document.getElementById('attachment').value = '';
+  document.getElementById('imagePreview').style.display = 'none';
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', toggleLocation);
+</script>
+{% endblock %}

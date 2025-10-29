@@ -1,0 +1,290 @@
+{% extends 'base.html' %}
+{% block title %}My Complaints - HostelHub{% endblock %}
+
+{% block content %}
+<h1 class="page-title animate__animated animate__fadeInDown">📋 My Complaints</h1>
+
+<div class="actions-bar">
+  <a href="{{ url_for('student.lodge_complaint') }}" class="btn btn-primary">
+    ➕ Lodge New Complaint
+  </a>
+</div>
+
+{% if complaints %}
+<div class="complaints-grid animate__animated animate__fadeInUp">
+  {% for complaint in complaints %}
+  <div class="complaint-card priority-{{ complaint.priority }}">
+    <div class="complaint-header">
+      <h3>{{ complaint.title }}</h3>
+      <div class="badges">
+        <span class="priority-badge priority-{{ complaint.priority }}">
+          {% if complaint.priority == 'urgent' %}🔴{% elif complaint.priority == 'high' %}🟠{% elif complaint.priority == 'medium' %}🟡{% else %}🟢{% endif %}
+          {{ complaint.priority | capitalize }}
+        </span>
+        <span class="status-badge status-{{ complaint.status }}">
+          {{ complaint.status.replace('_', ' ') | capitalize }}
+        </span>
+      </div>
+    </div>
+    
+    <div class="complaint-body">
+      <div class="complaint-meta">
+        <p><strong>📍 Location:</strong> 
+          {% if complaint.room %}
+            Room {{ complaint.room.block }}-{{ complaint.room.roomnumber }}
+          {% else %}
+            General Area
+          {% endif %}
+        </p>
+        <p><strong>📂 Category:</strong> {{ complaint.category | capitalize }}</p>
+        <p><strong>📅 Submitted:</strong> {{ complaint.created_at.strftime('%d %b %Y, %I:%M %p') if complaint.created_at else 'N/A' }}</p>
+        {% if complaint.resolved_date %}
+        <p><strong>✅ Resolved:</strong> {{ complaint.resolved_date.strftime('%d %b %Y') }}</p>
+        {% endif %}
+      </div>
+      
+      <div class="complaint-description">
+        <strong>Description:</strong>
+        <p>{{ complaint.description }}</p>
+      </div>
+      
+      <!-- ATTACHMENT DISPLAY -->
+      {% if complaint.attachment %}
+      <div class="attachment-section">
+        <strong>📎 Attachment:</strong>
+        <a href="{{ url_for('static', filename='uploads/complaints/' + complaint.attachment) }}" 
+           target="_blank" class="attachment-link">
+          {% if complaint.attachment.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')) %}
+            <img src="{{ url_for('static', filename='uploads/complaints/' + complaint.attachment) }}" 
+                 alt="Complaint attachment" class="attachment-thumbnail">
+          {% else %}
+            <div class="file-attachment">
+              📄 {{ complaint.attachment }}
+            </div>
+          {% endif %}
+        </a>
+      </div>
+      {% endif %}
+      
+      {% if complaint.resolution_notes %}
+      <div class="resolution-notes">
+        <strong>🔧 Maintenance Notes:</strong>
+        <p>{{ complaint.resolution_notes }}</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state animate__animated animate__fadeInUp">
+  <div class="empty-icon">📋</div>
+  <h3>No Complaints Yet</h3>
+  <p>You haven't lodged any complaints. If you face any issues, feel free to report them.</p>
+  <a href="{{ url_for('student.lodge_complaint') }}" class="btn btn-primary">Lodge Your First Complaint</a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.actions-bar {
+  margin-bottom: 2rem;
+}
+
+.complaints-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 2rem;
+}
+
+.complaint-card {
+  background: var(--surface-color);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px var(--shadow);
+  border-left: 5px solid;
+  transition: all 0.3s ease;
+}
+
+.complaint-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 32px var(--shadow);
+}
+
+.complaint-card.priority-urgent { border-left-color: var(--danger-color); }
+.complaint-card.priority-high { border-left-color: var(--warning-color); }
+.complaint-card.priority-medium { border-left-color: var(--info-color); }
+.complaint-card.priority-low { border-left-color: var(--success-color); }
+
+.complaint-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.complaint-header h3 {
+  color: var(--primary-color);
+  font-size: 1.25rem;
+  margin: 0;
+  flex: 1;
+}
+
+.badges {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+.priority-badge, .status-badge {
+  padding: 0.4rem 0.85rem;
+  border-radius: 16px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.priority-urgent { background: #FEE2E2; color: #991B1B; }
+.priority-high { background: #FEF3C7; color: #92400E; }
+.priority-medium { background: #DBEAFE; color: #1E40AF; }
+.priority-low { background: #D1FAE5; color: #065F46; }
+
+.status-badge {
+  font-size: 0.75rem;
+}
+
+.status-open { background: #FEE2E2; color: #991B1B; }
+.status-assigned { background: #DBEAFE; color: #1E40AF; }
+.status-in_progress { background: #FEF3C7; color: #92400E; }
+.status-resolved { background: #D1FAE5; color: #065F46; }
+.status-closed { background: #F3F4F6; color: #4B5563; }
+
+.complaint-meta {
+  margin-bottom: 1.25rem;
+}
+
+.complaint-meta p {
+  margin: 0.5rem 0;
+  font-size: 0.9375rem;
+}
+
+.complaint-description {
+  background: rgba(79, 70, 229, 0.04);
+  padding: 1rem;
+  border-radius: 10px;
+  margin: 1rem 0;
+}
+
+.complaint-description strong {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.complaint-description p {
+  margin: 0;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+/* ATTACHMENT STYLES */
+.attachment-section {
+  margin: 1.25rem 0;
+  padding: 1rem;
+  background: rgba(16, 185, 129, 0.06);
+  border-radius: 10px;
+  border: 2px dashed rgba(16, 185, 129, 0.3);
+}
+
+.attachment-section strong {
+  display: block;
+  margin-bottom: 0.75rem;
+  color: var(--success-color);
+}
+
+.attachment-link {
+  display: inline-block;
+  text-decoration: none;
+}
+
+.attachment-thumbnail {
+  max-width: 100%;
+  max-height: 250px;
+  border-radius: 10px;
+  border: 2px solid var(--border-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.attachment-thumbnail:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 24px var(--shadow);
+}
+
+.file-attachment {
+  padding: 1rem;
+  background: var(--surface-color);
+  border-radius: 8px;
+  text-align: center;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.resolution-notes {
+  background: rgba(16, 185, 129, 0.08);
+  padding: 1rem;
+  border-radius: 10px;
+  margin: 1rem 0;
+  border-left: 3px solid var(--success-color);
+}
+
+.resolution-notes strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--success-color);
+}
+
+.resolution-notes p {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 5rem 2rem;
+  background: var(--surface-color);
+  border-radius: 20px;
+  box-shadow: 0 4px 20px var(--shadow);
+}
+
+.empty-icon {
+  font-size: 6rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.6;
+}
+
+.empty-state h3 {
+  color: var(--primary-color);
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.empty-state p {
+  color: var(--text-secondary);
+  font-size: 1.125rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+  .complaints-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+{% endblock %}

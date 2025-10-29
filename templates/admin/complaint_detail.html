@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block title %}Complaint Details - Admin{% endblock %}
+
+{% block content %}
+<h1 class="page-title animate__animated animate__fadeInDown">Complaint #{{ complaint.complaintid }} Details</h1>
+
+<div class="complaint-detail-card animate__animated animate__fadeInUp">
+  <div class="detail-row">
+    <strong>Title:</strong>
+    <span>{{ complaint.title }}</span>
+  </div>
+  
+  <div class="detail-row">
+    <strong>Student:</strong>
+    <span>{{ complaint.student.name }} ({{ complaint.student.rollnumber }})</span>
+  </div>
+  
+  <div class="detail-row">
+    <strong>Category:</strong>
+    <span class="badge badge-info">{{ complaint.category | capitalize }}</span>
+  </div>
+  
+  <div class="detail-row">
+    <strong>Priority:</strong>
+    <span class="badge badge-{{ 'danger' if complaint.priority == 'urgent' else 'secondary' }}">{{ complaint.priority | capitalize }}</span>
+  </div>
+  
+  <div class="detail-row">
+    <strong>Status:</strong>
+    <span class="badge badge-{{ 'success' if complaint.status == 'resolved' else 'warning' }}">{{ complaint.status | capitalize }}</span>
+  </div>
+  
+  <div class="detail-row">
+    <strong>Created:</strong>
+    <span>{{ complaint.created_at.strftime('%d-%m-%Y %H:%M') if complaint.created_at else '' }}</span>
+  </div>
+  
+  <div class="detail-row">
+    <strong>Description:</strong>
+    <p>{{ complaint.description }}</p>
+  </div>
+  
+  {% if complaint.attachment %}
+  <div class="detail-row">
+    <strong>Attachment:</strong>
+    <a href="{{ url_for('static', filename=complaint.attachment[7:]) }}" target="_blank" class="btn btn-secondary btn-sm">View File</a>
+  </div>
+  {% endif %}
+  
+  {% if complaint.assigned_to %}
+  <div class="detail-row">
+    <strong>Assigned To:</strong>
+    <span>Maintenance Staff ID: {{ complaint.assigned_to }}</span>
+  </div>
+  {% endif %}
+  
+  {% if complaint.resolution_notes %}
+  <div class="detail-row">
+    <strong>Resolution Notes:</strong>
+    <p>{{ complaint.resolution_notes }}</p>
+  </div>
+  {% endif %}
+  
+  <a href="{{ url_for('admin.complaints') }}" class="btn btn-secondary mt-3">← Back to All Complaints</a>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.complaint-detail-card {
+  background: var(--surface-color);
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px var(--shadow);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.detail-row {
+  display: flex;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border-color);
+  gap: 1rem;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-row strong {
+  min-width: 150px;
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.detail-row span, .detail-row p {
+  flex: 1;
+}
+</style>
+{% endblock %}

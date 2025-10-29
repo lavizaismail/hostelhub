@@ -1,0 +1,424 @@
+{% extends 'base.html' %}
+{% block title %}Maintenance Dashboard - HostelHub{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1 class="page-title">🔧 Welcome, {{ current_user.username }}!</h1>
+    <p class="subtitle">Maintenance Dashboard</p>
+  </div>
+
+  <!-- Colorful Stats Cards with WORKING LINKS -->
+  <div class="info-card-grid">
+    <!-- My Assigned Card - Purple -->
+    <a href="{{ url_for('maintenance.my_assigned') }}" class="info-card clickable-card gradient-purple">
+      <div class="card-icon">👷</div>
+      <div class="card-content">
+        <h3>My Assigned</h3>
+        <p class="big-stat">{{ my_assigned_count }}</p>
+      </div>
+    </a>
+
+    <!-- Urgent Issues Card - Red/Orange -->
+    <a href="{{ url_for('maintenance.urgent') }}" class="info-card clickable-card gradient-red">
+      <div class="card-icon">🚨</div>
+      <div class="card-content">
+        <h3>Urgent Issues</h3>
+        <p class="big-stat">{{ urgent_count }}</p>
+      </div>
+    </a>
+
+    <!-- Resolved Card - Green -->
+    <a href="{{ url_for('maintenance.resolved') }}" class="info-card clickable-card gradient-green">
+      <div class="card-icon">✅</div>
+      <div class="card-content">
+        <h3>Resolved</h3>
+        <p class="big-stat">{{ resolved_count }}</p>
+      </div>
+    </a>
+
+    <!-- Unassigned Card - Blue -->
+    <a href="{{ url_for('maintenance.unassigned') }}" class="info-card clickable-card gradient-blue">
+      <div class="card-icon">📋</div>
+      <div class="card-content">
+        <h3>Unassigned</h3>
+        <p class="big-stat">{{ unassigned_count }}</p>
+      </div>
+    </a>
+  </div>
+
+  <!-- URGENT COMPLAINTS - Full Details -->
+  <div class="section-card">
+    <div class="section-header">
+      <h2>🚨 Urgent Issues (Full Details)</h2>
+      <a href="{{ url_for('maintenance.urgent') }}" class="btn btn-danger btn-sm">View All Urgent</a>
+    </div>
+
+    {% if urgent_complaints %}
+    <div class="complaints-list">
+      {% for c in urgent_complaints %}
+      <div class="complaint-item urgent-border">
+        <div class="complaint-header-row">
+          <h4 class="complaint-title">#{{ c.complaintid }} - {{ c.title }}</h4>
+          <span class="status-badge status-{{ c.status.lower().replace(' ', '-') }}">
+            {{ c.status }}
+          </span>
+        </div>
+        <div class="complaint-full-details">
+          <p><strong>Description:</strong> {{ c.description }}</p>
+          <p><strong>Room:</strong> {{ c.room.roomnumber }} | <strong>Student:</strong> {{ c.student.name }}</p>
+          <p><strong>Category:</strong> {{ c.category }} | <strong>Priority:</strong> <span class="priority-badge priority-high">{{ c.priority }}</span></p>
+          <p><strong>Created:</strong> {{ c.created_at.strftime('%d %b %Y, %I:%M %p') }}</p>
+          {% if c.resolution_notes %}
+          <p><strong>Notes:</strong> {{ c.resolution_notes }}</p>
+          {% endif %}
+        </div>
+        <div class="complaint-actions">
+          <a href="{{ url_for('maintenance.complaint_detail', id=c.complaintid) }}" class="btn-link">View Full Details →</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <p>✅ No urgent issues at the moment</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- RECENT COMPLAINTS - Title Only -->
+  <div class="section-card">
+    <div class="section-header">
+      <h2>📋 Recent Complaints</h2>
+      <a href="{{ url_for('maintenance.all_complaints') }}" class="btn btn-primary btn-sm">View All Complaints</a>
+    </div>
+
+    {% if recent_complaints %}
+    <div class="recent-titles-list">
+      {% for c in recent_complaints %}
+      <div class="title-item">
+        <span class="title-text">
+          #{{ c.complaintid }} - {{ c.title }}
+        </span>
+        <span class="title-meta">
+          <span class="priority-badge priority-{{ c.priority.lower() }}">{{ c.priority }}</span>
+          <span class="status-badge status-{{ c.status.lower().replace(' ', '-') }}">{{ c.status }}</span>
+        </span>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <p>✅ No recent complaints</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+.dashboard-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  margin-bottom: 2rem;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+  color: #1f2937;
+}
+
+.subtitle {
+  color: #6b7280;
+  margin: 0.5rem 0 0 0;
+  font-size: 1rem;
+}
+
+.info-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.info-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.clickable-card {
+  color: white;
+  cursor: pointer;
+}
+
+.gradient-purple {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gradient-red {
+  background: linear-gradient(135deg, #f43f5e 0%, #dc2626 100%);
+}
+
+.gradient-blue {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.gradient-green {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.clickable-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+}
+
+.clickable-card .card-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.95;
+}
+
+.clickable-card .card-content h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: white;
+  opacity: 0.95;
+}
+
+.clickable-card .big-stat {
+  font-size: 3rem;
+  font-weight: 800;
+  margin: 0;
+  line-height: 1;
+}
+
+.section-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  margin-bottom: 2rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.section-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  color: #1f2937;
+}
+
+.complaints-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.complaint-item {
+  padding: 1.25rem;
+  background: #f9fafb;
+  border-radius: 12px;
+  border-left: 4px solid #667eea;
+  transition: all 0.2s;
+}
+
+.urgent-border {
+  border-left-color: #dc2626;
+  background: #fef2f2;
+}
+
+.complaint-item:hover {
+  background: #f3f4f6;
+  border-left-width: 6px;
+  transform: translateX(4px);
+}
+
+.complaint-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.complaint-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+  flex: 1;
+  min-width: 200px;
+  color: #1f2937;
+}
+
+.complaint-full-details {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  line-height: 1.6;
+}
+
+.complaint-full-details p {
+  margin: 0.5rem 0;
+  color: #374151;
+}
+
+.complaint-actions {
+  margin-top: 0.75rem;
+}
+
+.recent-titles-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.title-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.title-item:hover {
+  background: #f3f4f6;
+}
+
+.title-text {
+  font-weight: 500;
+  color: #1f2937;
+  flex: 1;
+}
+
+.title-meta {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.status-badge {
+  padding: 0.375rem 0.875rem;
+  border-radius: 20px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.status-open { background: #FEF3C7; color: #92400E; }
+.status-forwarded { background: #DBEAFE; color: #1E40AF; }
+.status-staff-assigned { background: #E0E7FF; color: #3730A3; }
+.status-in-progress { background: #DBEAFE; color: #1E40AF; }
+.status-resolved { background: #D1FAE5; color: #065F46; }
+
+.priority-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.priority-high { background: #FEE2E2; color: #991B1B; }
+.priority-medium { background: #FEF3C7; color: #92400E; }
+.priority-low { background: #D1FAE5; color: #065F46; }
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #6b7280;
+  font-size: 1.125rem;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.625rem 1.25rem;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9375rem;
+}
+
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #5568d3 0%, #663a8e 100%);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #f43f5e 0%, #dc2626 100%);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: linear-gradient(135deg, #e11d48 0%, #b91c1c 100%);
+  box-shadow: 0 4px 12px rgba(244, 63, 94, 0.4);
+}
+
+.btn-link {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+
+.btn-link:hover {
+  color: #5568d3;
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1rem;
+  }
+  
+  .page-title {
+    font-size: 1.5rem;
+  }
+  
+  .info-card-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .title-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+</style>
+{% endblock %}

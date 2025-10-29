@@ -1,0 +1,372 @@
+{% extends 'base.html' %}
+{% block title %}My Complaints - HostelHub{% endblock %}
+
+{% block content %}
+<h1 class="page-title">📋 My Complaints History</h1>
+
+<div class="page-actions">
+    <a href="{{ url_for('student.lodge_complaint') }}" class="btn btn-primary">+ Lodge New Complaint</a>
+</div>
+
+<div class="filter-tabs">
+    <button class="filter-btn active" onclick="filterComplaints('all')">All</button>
+    <button class="filter-btn" onclick="filterComplaints('open')">Open</button>
+    <button class="filter-btn" onclick="filterComplaints('assigned')">Assigned</button>
+    <button class="filter-btn" onclick="filterComplaints('in_progress')">In Progress</button>
+    <button class="filter-btn" onclick="filterComplaints('resolved')">Resolved</button>
+</div>
+
+{% if complaints %}
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Location</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for complaint in complaints %}
+                <tr data-status="{{ complaint.status }}">
+                    <td><strong>#{{ complaint.complaintid }}</strong></td>
+                    <td>{{ complaint.title }}</td>
+                    <td>{{ complaint.category | capitalize }}</td>
+                    <td>
+                        {% if complaint.room %}
+                            Room {{ complaint.room.block }}-{{ complaint.room.roomnumber }}
+                        {% else %}
+                            General Area
+                        {% endif %}
+                    </td>
+                    <td><span class="badge badge-{{ complaint.priority }}">{{ complaint.priority | capitalize }}</span></td>
+                    <td><span class="badge badge-{{ complaint.status }}">{{ complaint.status.replace('_', ' ') | capitalize }}</span></td>
+                    <td>{{ complaint.created_at.strftime('%d %b %Y') if complaint.created_at else 'N/A' }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="viewComplaint({{ complaint.complaintid }})">View</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="icon">📋</div>
+    <h3>No Complaints Yet</h3>
+    <p>You haven't lodged any complaints</p>
+    <a href="{{ url_for('student.lodge_complaint') }}" class="btn btn-primary mt-2">Lodge First Complaint</a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.page-actions { margin-bottom: 1.5rem; }
+
+.filter-tabs {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 0.625rem 1rem;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-btn:hover { border-color: var(--primary); }
+.filter-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.table-card {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+}
+
+.table-responsive { overflow-x: auto; }
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.data-table thead {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+}
+
+.data-table th {
+    padding: 0.75rem;
+    text-align: left;
+    color: white;
+    font-weight: 600;
+    font-size: 0.8125rem;
+}
+
+.data-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.data-table tbody tr:hover {
+    background: rgba(79, 70, 229, 0.02);
+}
+
+.badge {
+    padding: 0.25rem 0.625rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-urgent { background: #FEE2E2; color: #991B1B; }
+.badge-high { background: #FEF3C7; color: #92400E; }
+.badge-medium { background: #DBEAFE; color: #1E40AF; }
+.badge-low { background: #D1FAE5; color: #065F46; }
+.badge-open { background: #FEE2E2; color: #991B1B; }
+.badge-assigned { background: #DBEAFE; color: #1E40AF; }
+.badge-in_progress { background: #FEF3C7; color: #92400E; }
+.badge-resolved { background: #D1FAE5; color: #065F46; }
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--surface);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+}
+
+.empty-state .icon { font-size: 5rem; margin-bottom: 1rem; opacity: 0.5; }
+.empty-state h3 { font-size: 1.5rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem; }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function filterComplaints(status) {
+    const rows = document.querySelectorAll('.data-table tbody tr');
+    const buttons = document.querySelectorAll('.filter-btn');
+    
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    rows.forEach(row => {
+        if (status === 'all' || row.dataset.status === status) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+function viewComplaint(id) {
+    window.location.href = `/student/complaints/${id}`;
+}
+</script>
+{% endblock %}
+{% extends 'base.html' %}
+{% block title %}My Complaints - HostelHub{% endblock %}
+
+{% block content %}
+<h1 class="page-title">📋 My Complaints History</h1>
+
+<div class="page-actions">
+    <a href="{{ url_for('student.lodge_complaint') }}" class="btn btn-primary">+ Lodge New Complaint</a>
+</div>
+
+<div class="filter-tabs">
+    <button class="filter-btn active" onclick="filterComplaints('all')">All</button>
+    <button class="filter-btn" onclick="filterComplaints('open')">Open</button>
+    <button class="filter-btn" onclick="filterComplaints('assigned')">Assigned</button>
+    <button class="filter-btn" onclick="filterComplaints('in_progress')">In Progress</button>
+    <button class="filter-btn" onclick="filterComplaints('resolved')">Resolved</button>
+</div>
+
+{% if complaints %}
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Location</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for complaint in complaints %}
+                <tr data-status="{{ complaint.status }}">
+                    <td><strong>#{{ complaint.complaintid }}</strong></td>
+                    <td>{{ complaint.title }}</td>
+                    <td>{{ complaint.category | capitalize }}</td>
+                    <td>
+                        {% if complaint.room %}
+                            Room {{ complaint.room.block }}-{{ complaint.room.roomnumber }}
+                        {% else %}
+                            General Area
+                        {% endif %}
+                    </td>
+                    <td><span class="badge badge-{{ complaint.priority }}">{{ complaint.priority | capitalize }}</span></td>
+                    <td><span class="badge badge-{{ complaint.status }}">{{ complaint.status.replace('_', ' ') | capitalize }}</span></td>
+                    <td>{{ complaint.created_at.strftime('%d %b %Y') if complaint.created_at else 'N/A' }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="viewComplaint({{ complaint.complaintid }})">View</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="icon">📋</div>
+    <h3>No Complaints Yet</h3>
+    <p>You haven't lodged any complaints</p>
+    <a href="{{ url_for('student.lodge_complaint') }}" class="btn btn-primary mt-2">Lodge First Complaint</a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.page-actions { margin-bottom: 1.5rem; }
+
+.filter-tabs {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 0.625rem 1rem;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-btn:hover { border-color: var(--primary); }
+.filter-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.table-card {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+}
+
+.table-responsive { overflow-x: auto; }
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.data-table thead {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+}
+
+.data-table th {
+    padding: 0.75rem;
+    text-align: left;
+    color: white;
+    font-weight: 600;
+    font-size: 0.8125rem;
+}
+
+.data-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.data-table tbody tr:hover {
+    background: rgba(79, 70, 229, 0.02);
+}
+
+.badge {
+    padding: 0.25rem 0.625rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-urgent { background: #FEE2E2; color: #991B1B; }
+.badge-high { background: #FEF3C7; color: #92400E; }
+.badge-medium { background: #DBEAFE; color: #1E40AF; }
+.badge-low { background: #D1FAE5; color: #065F46; }
+.badge-open { background: #FEE2E2; color: #991B1B; }
+.badge-assigned { background: #DBEAFE; color: #1E40AF; }
+.badge-in_progress { background: #FEF3C7; color: #92400E; }
+.badge-resolved { background: #D1FAE5; color: #065F46; }
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--surface);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+}
+
+.empty-state .icon { font-size: 5rem; margin-bottom: 1rem; opacity: 0.5; }
+.empty-state h3 { font-size: 1.5rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem; }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function filterComplaints(status) {
+    const rows = document.querySelectorAll('.data-table tbody tr');
+    const buttons = document.querySelectorAll('.filter-btn');
+    
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    rows.forEach(row => {
+        if (status === 'all' || row.dataset.status === status) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+function viewComplaint(id) {
+    window.location.href = `/student/complaints/${id}`;
+}
+</script>
+{% endblock %}

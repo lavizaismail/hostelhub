@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% block title %}User Management - HostelHub{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title animate__animated animate__fadeInDown">👥 User Management</h1>
+  <a href="{{ url_for('admin.export_users') }}" class="btn btn-success">📥 Export to CSV</a>
+</div>
+
+<!-- Search and Filter Section -->
+<div class="search-filter-section">
+  <form method="get" class="search-form">
+    <div class="search-box">
+      <input type="text" name="search" placeholder="🔍 Search by username or email..." 
+             class="form-control" value="{{ request.args.get('search', '') }}">
+    </div>
+    
+    <div class="filter-group">
+      <select name="role" class="form-control">
+        <option value="">All Roles</option>
+        <option value="student" {% if request.args.get('role') == 'student' %}selected{% endif %}>Student</option>
+        <option value="warden" {% if request.args.get('role') == 'warden' %}selected{% endif %}>Warden</option>
+        <option value="admin" {% if request.args.get('role') == 'admin' %}selected{% endif %}>Admin</option>
+        <option value="accountant" {% if request.args.get('role') == 'accountant' %}selected{% endif %}>Accountant</option>
+        <option value="maintenance" {% if request.args.get('role') == 'maintenance' %}selected{% endif %}>Maintenance</option>
+      </select>
+      
+      <select name="status" class="form-control">
+        <option value="">All Status</option>
+        <option value="active" {% if request.args.get('status') == 'active' %}selected{% endif %}>Active</option>
+        <option value="inactive" {% if request.args.get('status') == 'inactive' %}selected{% endif %}>Inactive</option>
+      </select>
+      
+      <button type="submit" class="btn btn-primary">🔍 Search</button>
+      <a href="{{ url_for('admin.users') }}" class="btn btn-secondary">🔄 Clear</a>
+    </div>
+  </form>
+</div>
+
+<div class="results-info">
+  <p>Showing <strong>{{ users|length }}</strong> users</p>
+</div>
+
+<table class="table animate__animated animate__fadeInUp">
+  <thead>
+    <tr>
+      <th>User ID</th>
+      <th>Username</th>
+      <th>Email</th>
+      <th>Role</th>
+      <th>Active</th>
+      <th>Created</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in users %}
+    <tr>
+      <td>{{ user.userid }}</td>
+      <td>{{ user.username }}</td>
+      <td>{{ user.email }}</td>
+      <td><span class="badge badge-info">{{ user.role | capitalize }}</span></td>
+      <td>
+        {% if user.is_active %}
+        <span class="badge badge-success">Active</span>
+        {% else %}
+        <span class="badge badge-danger">Inactive</span>
+        {% endif %}
+      </td>
+      <td>{{ user.created_at.strftime('%d-%m-%Y') if user.created_at else 'N/A' }}</td>
+      <td>
+        {% if user.is_active %}
+        <a href="{{ url_for('admin.deactivate_user', user_id=user.userid) }}" class="btn btn-danger btn-sm">Deactivate</a>
+        {% else %}
+        <a href="{{ url_for('admin.activate_user', user_id=user.userid) }}" class="btn btn-success btn-sm">Activate</a>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.search-filter-section {
+  background: var(--surface-color);
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px var(--shadow);
+  margin-bottom: 2rem;
+}
+
+.search-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.search-box {
+  width: 100%;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 12px 20px;
+  font-size: 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.search-box input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.filter-group {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.filter-group select {
+  flex: 1;
+  min-width: 150px;
+}
+
+.results-info {
+  margin-bottom: 1rem;
+  color: var(--text-secondary);
+}
+
+.badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.badge-info { background: var(--info-color); color: white; }
+.badge-success { background: var(--success-color); color: white; }
+.badge-danger { background: var(--danger-color); color: white; }
+
+@media (max-width: 768px) {
+  .filter-group {
+    flex-direction: column;
+  }
+  
+  .filter-group select,
+  .filter-group button {
+    width: 100%;
+  }
+}
+</style>
+{% endblock %}

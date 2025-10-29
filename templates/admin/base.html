@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<style>
+.admin-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 0;
+    min-height: calc(100vh - 120px);
+}
+
+.admin-sidebar {
+    background: linear-gradient(180deg, #1F2937 0%, #111827 100%);
+    padding: 1.5rem 0;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-sidebar-title {
+    color: white;
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 0 1.5rem;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.admin-nav {
+    list-style: none;
+}
+
+.admin-nav-item {
+    margin: 0.25rem 0;
+}
+
+.admin-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1.5rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+}
+
+.admin-nav-link:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+}
+
+.admin-nav-link.active {
+    background: rgba(79, 70, 229, 0.15);
+    color: white;
+    border-left-color: var(--primary);
+}
+
+.admin-nav-icon {
+    font-size: 1.125rem;
+}
+
+.admin-content {
+    padding: 1.5rem;
+    background: var(--bg);
+}
+
+@media (max-width: 1024px) {
+    .admin-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .admin-sidebar {
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <h3 class="admin-sidebar-title">🛡️ Admin Panel</h3>
+        <nav>
+            <ul class="admin-nav">
+                <li class="admin-nav-item">
+                    <a href="{{ url_for('admin.dashboard') }}" class="admin-nav-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+                        <span class="admin-nav-icon">📊</span>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="admin-nav-item">
+                    <a href="{{ url_for('admin.users') }}" class="admin-nav-link {% if request.endpoint == 'admin.users' %}active{% endif %}">
+                        <span class="admin-nav-icon">👥</span>
+                        <span>Users</span>
+                    </a>
+                </li>
+                <li class="admin-nav-item">
+                    <a href="{{ url_for('admin.rooms') }}" class="admin-nav-link {% if request.endpoint == 'admin.rooms' %}active{% endif %}">
+                        <span class="admin-nav-icon">🏠</span>
+                        <span>Rooms</span>
+                    </a>
+                </li>
+                <li class="admin-nav-item">
+                    <a href="{{ url_for('admin.complaints') }}" class="admin-nav-link {% if request.endpoint == 'admin.complaints' %}active{% endif %}">
+                        <span class="admin-nav-icon">🔧</span>
+                        <span>Complaints</span>
+                    </a>
+                </li>
+                <li class="admin-nav-item">
+                    <a href="{{ url_for('admin.reports') }}" class="admin-nav-link {% if request.endpoint == 'admin.reports' %}active{% endif %}">
+                        <span class="admin-nav-icon">📈</span>
+                        <span>Reports</span>
+                    </a>
+                </li>
+                <li class="admin-nav-item">
+                    <a href="{{ url_for('admin.audit_logs') }}" class="admin-nav-link {% if request.endpoint == 'admin.audit_logs' %}active{% endif %}">
+                        <span class="admin-nav-icon">📝</span>
+                        <span>Audit Logs</span>
+                    </a>
+                </li>
+                <li class="admin-nav-item">
+                    <a href="{{ url_for('admin.settings') }}" class="admin-nav-link {% if request.endpoint == 'admin.settings' %}active{% endif %}">
+                        <span class="admin-nav-icon">⚙️</span>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+    
+    <main class="admin-content">
+        {% block admin_content %}{% endblock %}
+    </main>
+</div>
+{% endblock %}

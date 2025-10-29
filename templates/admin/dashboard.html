@@ -1,0 +1,309 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard - HostelHub{% endblock %}
+
+{% block content %}
+<h1 class="page-title animate__animated animate__fadeInDown">🏠 Admin Dashboard</h1>
+
+<div class="stats-cards animate__animated animate__fadeInUp animate__delay-1s">
+  <div class="card stat-card stat-purple">
+    <div class="stat-icon">🏢</div>
+    <div class="stat-value">{{ total_rooms }}</div>
+    <div class="stat-label">Total Rooms</div>
+  </div>
+
+  <div class="card stat-card stat-orange">
+    <div class="stat-icon">👥</div>
+    <div class="stat-value">{{ total_students }}</div>
+    <div class="stat-label">Total Students</div>
+  </div>
+
+  <div class="card stat-card stat-blue">
+    <div class="stat-icon">🔑</div>
+    <div class="stat-value">{{ occupied_rooms }}</div>
+    <div class="stat-label">Occupied Rooms</div>
+  </div>
+
+  <div class="card stat-card stat-green">
+    <div class="stat-icon">📝</div>
+    <div class="stat-value">{{ active_allocations }}</div>
+    <div class="stat-label">Active Allocations</div>
+  </div>
+</div>
+
+<!-- Charts Section -->
+<section class="charts-section animate__animated animate__fadeInUp animate__delay-2s">
+  <h2 class="section-title">📊 Analytics Overview</h2>
+  <div class="charts-grid">
+    <div class="card chart-card">
+      <h3>Monthly Revenue</h3>
+      <canvas id="revenueChart"></canvas>
+    </div>
+    
+    <div class="card chart-card">
+      <h3>Complaint Status</h3>
+      <canvas id="complaintChart"></canvas>
+    </div>
+  </div>
+</section>
+
+<!-- Quick Actions -->
+<section class="dashboard-actions animate__animated animate__fadeInUp animate__delay-3s">
+  <h2 class="section-title">⚡ Quick Actions</h2>
+  <div class="action-grid">
+    <a href="{{ url_for('admin.users') }}" class="action-card action-primary">
+      <div class="action-icon">👥</div>
+      <h3>Manage Users</h3>
+      <p>View and manage all users</p>
+    </a>
+    
+    <a href="{{ url_for('admin.rooms') }}" class="action-card action-info">
+      <div class="action-icon">🏢</div>
+      <h3>Manage Rooms</h3>
+      <p>Room allocation and management</p>
+    </a>
+    
+    <a href="{{ url_for('admin.complaints') }}" class="action-card action-danger">
+      <div class="action-icon">📋</div>
+      <h3>View Complaints</h3>
+      <p>Monitor and resolve issues</p>
+    </a>
+    
+    <a href="{{ url_for('admin.reports') }}" class="action-card action-success">
+      <div class="action-icon">📊</div>
+      <h3>Reports</h3>
+      <p>View detailed analytics</p>
+    </a>
+    
+    <a href="{{ url_for('admin.audit_logs') }}" class="action-card action-info">
+      <div class="action-icon">📜</div>
+      <h3>Audit Logs</h3>
+      <p>View system activity logs</p>
+    </a>
+    
+    <a href="{{ url_for('admin.backup_page') }}" class="action-card action-info">
+      <div class="action-icon">💾</div>
+      <h3>Backup & Restore</h3>
+      <p>Database backup management</p>
+    </a>
+</div>
+  </div>
+</section>
+
+<!-- Use offline Chart.js -->
+<script src="{{ url_for('static', filename='js/chart.js') }}"></script>
+
+<script>
+// Revenue Chart - Parrot Green
+const revenueCtx = document.getElementById('revenueChart');
+if (revenueCtx) {
+    const gradient = revenueCtx.getContext('2d').createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(68, 212, 59, 0.8)');    // Parrot Green
+    gradient.addColorStop(1, 'rgba(144, 238, 144, 0.2)');  // Light Green
+    
+    new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+            labels: {{ months | tojson | safe }},
+            datasets: [{
+                label: 'Revenue (₹)',
+                data: {{ monthly_revenue | tojson | safe }},
+                borderColor: 'rgb(34, 139, 34)',  // Forest Green border (darker)
+                backgroundColor: gradient,  // Parrot Green gradient fill
+                tension: 0.4,
+                fill: true,
+                borderWidth: 3,
+                pointBackgroundColor: 'rgb(34, 139, 34)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: { 
+                legend: { 
+                    display: true,
+                    labels: { color: '#4B5563' }
+                } 
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { 
+                        callback: v => '₹' + v.toLocaleString(),
+                        color: '#6B7280'
+                    },
+                    grid: { color: 'rgba(0,0,0,0.05)' }
+                },
+                x: {
+                    ticks: { color: '#6B7280' },
+                    grid: { color: 'rgba(0,0,0,0.05)' }
+                }
+            }
+        }
+    });
+}
+
+// Complaint Chart - Original Colors (Pink/Yellow/Teal)
+const complaintCtx = document.getElementById('complaintChart');
+if (complaintCtx) {
+    new Chart(complaintCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Open', 'In Progress', 'Resolved'],
+            datasets: [{
+                data: [
+                    {{ open_complaints | default(0) }},
+                    {{ in_progress_complaints | default(0) }},
+                    {{ resolved_complaints | default(0) }}
+                ],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.8)',   // Pink - Open
+                    'rgba(255, 206, 86, 0.8)',   // Yellow - In Progress
+                    'rgba(75, 192, 192, 0.8)'    // Teal - Resolved
+                ],
+                borderColor: [
+                    'rgb(255, 99, 132)',
+                    'rgb(255, 206, 86)',
+                    'rgb(75, 192, 192)'
+                ],
+                borderWidth: 2,
+                hoverOffset: 15
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: { 
+                legend: { 
+                    display: true,
+                    position: 'bottom',
+                    labels: { 
+                        padding: 15,
+                        color: '#4B5563',
+                        font: { size: 12 }
+                    }
+                }
+            }
+        }
+    });
+}
+</script>
+
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.section-title {
+  font-size: 1.8rem;
+  color: var(--primary-color);
+  margin: 2rem 0 1.5rem;
+  font-weight: 700;
+}
+
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.stat-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.9;
+}
+
+.stat-orange { background: linear-gradient(135deg, #F59E0B, #D97706); }
+.stat-blue { background: linear-gradient(135deg, #3B82F6, #2563EB); }
+.stat-purple { background: linear-gradient(135deg, #8B5CF6, #7C3AED); }
+.stat-green { background: linear-gradient(135deg, #10B981, #059669); }
+
+/* Charts */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.chart-card {
+  padding: 2rem;
+}
+
+.chart-card h3 {
+  margin-bottom: 1.5rem;
+  color: var(--primary-color);
+}
+
+.chart-card canvas {
+  max-height: 300px;
+}
+
+/* Quick Actions */
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.action-card {
+  background: var(--surface-color);
+  padding: 2rem;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 4px 20px var(--shadow);
+  transition: all 0.3s ease;
+  text-decoration: none;
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.action-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+}
+
+.action-card.action-primary::before { background: linear-gradient(90deg, #4F46E5, #6366F1); }
+.action-card.action-danger::before { background: linear-gradient(90deg, #EF4444, #F87171); }
+.action-card.action-success::before { background: linear-gradient(90deg, #10B981, #34D399); }
+.action-card.action-info::before { background: linear-gradient(90deg, #3B82F6, #60A5FA); }
+
+.action-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--primary-color);
+  box-shadow: 0 8px 30px var(--shadow);
+}
+
+.action-icon {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+}
+
+.action-card h3 {
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+  font-size: 1.3rem;
+}
+
+.action-card p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+</style>
+{% endblock %}

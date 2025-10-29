@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Payment History{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>💰 Payment History</h2>
+    
+    {% if payments %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Roll No.</th>
+                <th>Amount</th>
+                <th>Month</th>
+                <th>Payment Method</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pay in payments %}
+            <tr>
+                <td>{{ pay.student.fullname }}</td>
+                <td>{{ pay.student.rollnumber }}</td>
+                <td>₹ {{ pay.amount | round(2) }}</td>
+                <td>{{ pay.month | capitalize }}</td>
+                <td>{{ pay.paymentmethod | capitalize if pay.paymentmethod else 'N/A' }}</td>
+                <td>
+                    {% if pay.status == 'verified' %}
+                        <span class="badge bg-success">Verified</span>
+                    {% elif pay.status == 'paid' %}
+                        <span class="badge bg-warning">Pending Verification</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Pending</span>
+                    {% endif %}
+                </td>
+                <td>{{ pay.paymentdate.strftime('%d-%m-%Y') if pay.paymentdate else 'N/A' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-info">No payment records found.</div>
+    {% endif %}
+</div>
+{% endblock %}

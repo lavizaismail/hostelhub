@@ -1,0 +1,338 @@
+{% extends 'base.html' %}
+{% block title %}Request Room{% endblock %}
+
+{% block content %}
+<h1 class="page-title animate__animated animate__fadeInDown">🏠 Request Room Allocation</h1>
+
+<!-- Information Cards -->
+<div class="info-cards animate__animated animate__fadeIn">
+  <div class="info-card">
+    <div class="info-icon">📋</div>
+    <div class="info-content">
+      <h3>Application Process</h3>
+      <p>Select your preferred room and submit your request. Warden will review within 24-48 hours.</p>
+    </div>
+  </div>
+  <div class="info-card">
+    <div class="info-icon">✅</div>
+    <div class="info-content">
+      <h3>What Happens Next?</h3>
+      <p>You'll receive a notification once your request is approved or requires action.</p>
+    </div>
+  </div>
+  <div class="info-card">
+    <div class="info-icon">💰</div>
+    <div class="info-content">
+      <h3>Payment Due</h3>
+      <p>After approval, you'll have 7 days to complete the payment to confirm allocation.</p>
+    </div>
+  </div>
+</div>
+
+<form method="POST" class="form animate__animated animate__fadeInUp" id="roomRequestForm" novalidate>
+  
+  {% if rooms %}
+  <div class="form-group">
+    <label for="roomid" class="form-label">Select Available Room <span class="text-danger">*</span></label>
+    <select name="roomid" id="roomid" class="form-control" required>
+      <option value="">-- Choose a Room --</option>
+      {% for room in rooms %}
+      <option value="{{ room.roomid }}">
+        Block {{ room.block }} - Room {{ room.roomnumber }} 
+        ({{ room.gender|capitalize }} | Floor {{ room.floor }} | 
+        Capacity: {{ room.capacity }} | ₹{{ room.monthly_rent }}/month)
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="room-preview" id="roomPreview" style="display:none;">
+    <h3>🏠 Room Details</h3>
+    <div class="room-details" id="roomDetails"></div>
+  </div>
+
+  <!-- Hostel Rules & Guidelines -->
+  <div class="guidelines-box">
+    <h3>📌 Important Guidelines</h3>
+    <ul class="guidelines-list">
+      <li><strong>Check-in Time:</strong> Mon-Fri, 9 AM - 5 PM</li>
+      <li><strong>Security Deposit:</strong> One month's rent (refundable)</li>
+      <li><strong>Minimum Stay:</strong> 6 months</li>
+      <li><strong>Quiet Hours:</strong> 10 PM - 7 AM daily</li>
+      <li><strong>Visitors:</strong> Allowed in common areas only (9 AM - 8 PM)</li>
+    </ul>
+  </div>
+
+  <div class="form-group">
+    <label class="checkbox-container">
+      <input type="checkbox" name="terms" id="terms" required>
+      <span class="checkmark"></span>
+      I agree to the hostel rules and regulations <span class="text-danger">*</span>
+    </label>
+    <small class="form-text">
+      <a href="#" class="text-primary">View complete hostel rules →</a>
+    </small>
+  </div>
+
+  <button type="submit" class="btn btn-primary btn-lg w-100">Submit Room Request 🚀</button>
+  
+  {% else %}
+  <div class="alert alert-warning">
+    <strong>⚠️ No rooms available at the moment</strong>
+    <p>Please check back later or contact the warden.</p>
+  </div>
+  {% endif %}
+</form>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Info Cards */
+.info-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.info-card {
+  display: flex;
+  gap: 1rem;
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.05), rgba(139, 92, 246, 0.05));
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.info-card:hover {
+  border-color: var(--primary-color);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.15);
+}
+
+.info-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.info-content h3 {
+  color: var(--primary-color);
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.info-content p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* Room Preview */
+.room-preview {
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(139, 92, 246, 0.1));
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin: 1.5rem 0;
+  border: 2px solid var(--primary-color);
+}
+
+.room-preview h3 {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.room-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.room-details .detail-item {
+  background: var(--surface-color);
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+.room-details .detail-item strong {
+  color: var(--primary-color);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+/* Guidelines Box */
+.guidelines-box {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(5, 150, 105, 0.05));
+  border: 2px solid #10b981;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.guidelines-box h3 {
+  color: #10b981;
+  margin-bottom: 1rem;
+}
+
+.guidelines-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.guidelines-list li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+  color: var(--text-primary);
+}
+
+.guidelines-list li:last-child {
+  border-bottom: none;
+}
+
+.guidelines-list strong {
+  color: #10b981;
+}
+
+/* Checkbox Styling */
+.checkbox-container {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 22px;
+  width: 22px;
+  background-color: var(--surface-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 4px;
+}
+
+.checkbox-container:hover input ~ .checkmark {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.checkbox-container input:checked ~ .checkmark {
+  background-color: var(--primary-color);
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.checkbox-container .checkmark:after {
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.form-text {
+  display: block;
+  margin-top: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const roomData = {
+  {% for room in rooms %}
+  "{{ room.roomid }}": {
+    block: "{{ room.block }}",
+    roomnumber: "{{ room.roomnumber }}",
+    capacity: {{ room.capacity }},
+    gender: "{{ room.gender }}",
+    floor: {{ room.floor }},
+    rent: {{ room.monthly_rent }},
+    amenities: "{{ room.amenities or 'Basic facilities' }}"
+  },
+  {% endfor %}
+};
+
+document.getElementById('roomid').addEventListener('change', function() {
+  const roomId = this.value;
+  const preview = document.getElementById('roomPreview');
+  const details = document.getElementById('roomDetails');
+  
+  if (roomId && roomData[roomId]) {
+    const room = roomData[roomId];
+    details.innerHTML = `
+      <div class="detail-item">
+        <strong>🏢 Block & Room</strong>
+        <span>${room.block} - ${room.roomnumber}</span>
+      </div>
+      <div class="detail-item">
+        <strong>👥 Capacity</strong>
+        <span>${room.capacity} persons</span>
+      </div>
+      <div class="detail-item">
+        <strong>🚻 Gender</strong>
+        <span>${room.gender.charAt(0).toUpperCase() + room.gender.slice(1)}</span>
+      </div>
+      <div class="detail-item">
+        <strong>🏗️ Floor</strong>
+        <span>Floor ${room.floor}</span>
+      </div>
+      <div class="detail-item">
+        <strong>💰 Monthly Rent</strong>
+        <span>₹${room.rent}</span>
+      </div>
+      <div class="detail-item" style="grid-column: 1 / -1;">
+        <strong>✨ Amenities</strong>
+        <span>${room.amenities}</span>
+      </div>
+    `;
+    preview.style.display = 'block';
+  } else {
+    preview.style.display = 'none';
+  }
+});
+
+// Form validation
+document.getElementById('roomRequestForm').addEventListener('submit', function(e) {
+  const roomSelect = document.getElementById('roomid');
+  const termsCheckbox = document.getElementById('terms');
+  
+  if (!roomSelect.value) {
+    e.preventDefault();
+    alert('⚠️ Please select a room before submitting!');
+    roomSelect.focus();
+    return false;
+  }
+  
+  if (!termsCheckbox.checked) {
+    e.preventDefault();
+    alert('⚠️ Please accept the hostel rules and regulations to continue!');
+    termsCheckbox.focus();
+    return false;
+  }
+});
+</script>
+{% endblock %}

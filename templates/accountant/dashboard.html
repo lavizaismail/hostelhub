@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% block title %}Accountant Dashboard - HostelHub{% endblock %}
+
+{% block content %}
+<h1 class="page-title animate__animated animate__fadeInDown">💰 Accountant Dashboard</h1>
+
+<div class="stats-cards animate__animated animate__fadeInUp animate__delay-1s">
+  <div class="card stat-card stat-purple">
+    <div class="stat-icon">💳</div>
+    <div class="stat-value">{{ pending_count }}</div>
+    <div class="stat-label">Pending Verification</div>
+    <a href="{{ url_for('accountant.pending_payments') }}" class="btn btn-light btn-sm mt-2">Review Now</a>
+  </div>
+
+  <div class="card stat-card stat-green">
+    <div class="stat-icon">✅</div>
+    <div class="stat-value">{{ verified_count }}</div>
+    <div class="stat-label">Verified Payments</div>
+    <a href="{{ url_for('accountant.payment_history') }}" class="btn btn-light btn-sm mt-2">View History</a>
+  </div>
+
+  <div class="card stat-card stat-blue">
+    <div class="stat-icon">📊</div>
+    <div class="stat-value">₹{{ (total_revenue | default(0)) | round(2) }}</div>
+    <div class="stat-label">Total Revenue</div>
+  </div>
+
+  <div class="card stat-card stat-orange">
+    <div class="stat-icon">⏳</div>
+    <div class="stat-value">₹{{ (outstanding_amount | default(0)) | round(2) }}</div>
+    <div class="stat-label">Outstanding Amount</div>
+  </div>
+</div>
+
+<!-- Recent Payments -->
+<section class="recent-payments animate__animated animate__fadeInUp animate__delay-2s">
+  <h2 class="section-title">📋 Recent Transactions</h2>
+  <div class="card">
+    <div style="overflow-x: auto;">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Student</th>
+            <th>Amount</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if payments %}
+            {% for payment in payments %}
+            <tr>
+              <td><strong>#{{ payment.paymentid }}</strong></td>
+              <td>{{ payment.student.name }}</td>
+              <td><strong>₹{{ payment.amount | round(2) }}</strong></td>
+              <td><span class="badge badge-info">Hostel Fee</span></td>
+              <td>
+                {% if payment.status == 'verified' %}
+                  <span class="badge badge-success">Verified</span>
+                {% else %}
+                  <span class="badge badge-warning">Pending</span>
+                {% endif %}
+              </td>
+              <td>{{ payment.created_at.strftime('%d %b %Y') if payment.created_at else 'N/A' }}</td>
+              <td>
+                {% if payment.status == 'pending_verification' %}
+                  <a href="{{ url_for('accountant.review_payment', payment_id=payment.paymentid) }}" class="btn btn-sm btn-primary">Review</a>
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr><td colspan="7" style="text-align: center;">No payments found</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.section-title {
+  font-size: 1.8rem;
+  color: var(--primary-color);
+  margin: 2rem 0 1.5rem;
+  font-weight: 700;
+}
+
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.stat-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.9;
+}
+
+.stat-orange { background: linear-gradient(135deg, #F59E0B, #D97706); }
+.stat-blue { background: linear-gradient(135deg, #3B82F6, #2563EB); }
+.stat-purple { background: linear-gradient(135deg, #8B5CF6, #7C3AED); }
+.stat-green { background: linear-gradient(135deg, #10B981, #059669); }
+
+.btn-light {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-light:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.badge-success { background: var(--success-color); color: white; }
+.badge-warning { background: var(--warning-color); color: white; }
+.badge-info { background: var(--info-color); color: white; }
+</style>
+{% endblock %}

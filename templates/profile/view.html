@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Profile Card -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <div class="profile-avatar mb-3">
+                        <div class="avatar-circle">
+                            {{ current_user.username[0].upper() }}
+                        </div>
+                    </div>
+                    <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='{{ url_for('profile.upload_picture') }}'">
+                        <i class="fas fa-camera"></i> Change Picture
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Profile Details -->
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3 class="card-title mb-0">{{ current_user.username }}</h3>
+                        <span class="badge bg-primary">{{ current_user.role.title() }}</span>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <p class="text-muted mb-1"><i class="fas fa-envelope"></i> Email:</p>
+                            <p class="fw-bold">{{ current_user.email }}</p>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <p class="text-muted mb-1"><i class="fas fa-user"></i> User ID:</p>
+                            <p class="fw-bold">#{{ current_user.userid }}</p>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <p class="text-muted mb-1"><i class="fas fa-calendar"></i> Member Since:</p>
+                            <p class="fw-bold">{{ current_user.created_at.strftime('%d %B %Y') }}</p>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <p class="text-muted mb-1"><i class="fas fa-check-circle"></i> Account Status:</p>
+                            <p class="fw-bold text-success">Active</p>
+                        </div>
+                    </div>
+
+
+                    {% if current_user.role == 'student' %}
+                    <hr>
+                    <h5 class="mb-3">Student Information</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <p class="text-muted mb-1"><i class="fas fa-id-card"></i> Roll Number:</p>
+                            <p class="fw-bold">{{ current_user.student.rollnumber if current_user.student else 'Not provided' }}</p>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <p class="text-muted mb-1"><i class="fas fa-book"></i> Course:</p>
+                            <p class="fw-bold">{{ current_user.student.course if current_user.student else 'PLAYGROUP - Year 1' }}</p>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <p class="text-muted mb-1"><i class="fas fa-phone"></i> Phone:</p>
+                            <p class="fw-bold">{{ current_user.student.phone if current_user.student and current_user.student.phone else 'Not provided' }}</p>
+                        </div>
+
+
+                        <div class="col-md-6 mb-3">
+                            <p class="text-muted mb-1"><i class="fas fa-venus-mars"></i> Gender:</p>
+                            <p class="fw-bold">{{ current_user.student.gender.title() if current_user.student and current_user.student.gender else 'Not Set' }}</p>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <p class="text-muted mb-1"><i class="fas fa-phone-alt"></i> Guardian Phone:</p>
+                            <p class="fw-bold">{{ current_user.student.guardianphone if current_user.student and current_user.student.guardianphone else 'Not provided' }}</p>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <p class="text-muted mb-1"><i class="fas fa-home"></i> Address:</p>
+                            <p class="fw-bold">{{ current_user.student.address if current_user.student and current_user.student.address else 'Not provided' }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+
+                    <div class="mt-4">
+                        <a href="{{ url_for('profile.edit_profile') }}" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Edit Profile
+                        </a>
+                        <a href="{{ url_for('profile.change_password') }}" class="btn btn-secondary">
+                            <i class="fas fa-lock"></i> Change Password
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<style>
+.avatar-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    font-weight: bold;
+    margin: 0 auto;
+}
+</style>
+{% endblock %}

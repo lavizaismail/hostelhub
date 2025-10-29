@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Submit Payment - HostelHub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>💰 Submit Payment Details</h2>
+    
+    <div class="payment-info">
+        <h3>Payment Information</h3>
+        <p><strong>Amount:</strong> ₹{{ payment.amount }}</p>
+        <p><strong>Type:</strong> Hostel Fee</p>
+        <p><strong>Status:</strong> {{ payment.status }}</p>
+    </div>
+    
+    <form method="POST" class="payment-form">
+        <div class="form-group">
+            <label for="transaction_id">Transaction ID / Reference Number *</label>
+            <input type="text" id="transaction_id" name="transaction_id" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="payer_name">Payer Name *</label>
+            <input type="text" id="payer_name" name="payer_name" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="payment_date">Payment Date *</label>
+            <input type="date" id="payment_date" name="payment_date" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="payment_time">Payment Time *</label>
+            <input type="time" id="payment_time" name="payment_time" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="bank_name">Bank Name *</label>
+            <input type="text" id="bank_name" name="bank_name" class="form-control" placeholder="e.g., State Bank of India" required>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">✅ Submit Payment Details</button>
+        <a href="{{ url_for('student.payments') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

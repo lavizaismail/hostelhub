@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Manage Complaints{% endblock %}
+{% block content %}
+<h1 class="page-title animate__animated animate__fadeInDown">Manage Complaints</h1>
+
+<form method="get" class="filter-form animate__animated animate__fadeInUp">
+  <label for="status">Status:</label>
+  <select name="status" id="status" onchange="this.form.submit()">
+    <option value="">All</option>
+    <option value="open" {% if request.args.get('status') == 'open' %}selected{% endif %}>Open</option>
+    <option value="assigned" {% if request.args.get('status') == 'assigned' %}selected{% endif %}>Assigned</option>
+    <option value="in_progress" {% if request.args.get('status') == 'in_progress' %}selected{% endif %}>In Progress</option>
+    <option value="resolved" {% if request.args.get('status') == 'resolved' %}selected{% endif %}>Resolved</option>
+    <option value="closed" {% if request.args.get('status') == 'closed' %}selected{% endif %}>Closed</option>
+  </select>
+
+  <label for="priority">Priority:</label>
+  <select name="priority" id="priority" onchange="this.form.submit()">
+    <option value="">All</option>
+    <option value="low" {% if request.args.get('priority') == 'low' %}selected{% endif %}>Low</option>
+    <option value="medium" {% if request.args.get('priority') == 'medium' %}selected{% endif %}>Medium</option>
+    <option value="high" {% if request.args.get('priority') == 'high' %}selected{% endif %}>High</option>
+    <option value="urgent" {% if request.args.get('priority') == 'urgent' %}selected{% endif %}>Urgent</option>
+  </select>
+</form>
+
+{% if complaints %}
+<table class="table animate__animated animate__fadeInUp">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Student</th>
+      <th>Status</th>
+      <th>Priority</th>
+      <th>Created</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for c in complaints %}
+    <tr>
+      <td>{{ c.title }}</td>
+      <td>{{ c.student.name }}</td>
+      <td>{{ c.status|capitalize }}</td>
+      <td>{{ c.priority|capitalize }}</td>
+      <td>{{ c.created_at.strftime('%d-%m-%Y') if c.created_at else '' }}</td>
+      <td><a href="{{ url_for('warden.complaint_detail', id=c.complaintid) }}" class="btn btn-primary btn-sm">Details</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No complaints found.</p>
+{% endif %}
+{% endblock %}

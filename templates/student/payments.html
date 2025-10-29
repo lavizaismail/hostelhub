@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}My Payments - HostelHub{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="page-title animate__animated animate__fadeIn">💳 My Payments</h1>
+    
+    {% if payments %}
+    <div class="table-responsive mt-4">
+        <table class="table table-striped table-hover">
+            <thead class="table-primary">
+                <tr>
+                    <th>Payment ID</th>
+                    <th>Amount</th>
+                    <th>Month</th>
+                    <th>Year</th>
+                    <th>Status</th>
+                    <th>Payment Date</th>
+                    <th>Transaction ID</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pay in payments %}
+                <tr>
+                    <td>#{{ pay.paymentid }}</td>
+                    <td>₹{{ pay.amount | round(2) }}</td>
+                    <td>{{ pay.month }}</td>
+                    <td>{{ pay.year }}</td>
+                    <td>
+                        {% if pay.status == 'verified' %}
+                            <span class="badge bg-success">✅ Verified</span>
+                        {% elif pay.status == 'paid' %}
+                            <span class="badge bg-info">💰 Paid</span>
+                        {% elif pay.status == 'pending' %}
+                            <span class="badge bg-warning">⏳ Payment Pending</span>
+                        {% elif pay.status == 'rejected' %}
+                            <span class="badge bg-danger">❌ Rejected</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ pay.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ pay.paymentdate.strftime('%d-%m-%Y') if pay.paymentdate else 'Not Submitted' }}</td>
+                    <td>{{ pay.transactionid if pay.transactionid else 'N/A' }}</td>
+                    <td>
+                        {% if pay.status == 'pending' %}
+                            <a href="{{ url_for('student.submit_payment', payment_id=pay.paymentid) }}" class="btn btn-sm btn-primary">
+                                💸 Submit Payment
+                            </a>
+                        {% elif pay.status == 'verified' %}
+                            <a href="{{ url_for('student.download_receipt', payment_id=pay.paymentid) }}" class="btn btn-sm btn-success">
+                                📄 Download Receipt
+                            </a>
+                        {% elif pay.status == 'rejected' %}
+                            <a href="{{ url_for('student.submit_payment', payment_id=pay.paymentid) }}" class="btn btn-sm btn-warning">
+                                🔄 Resubmit
+                            </a>
+                        {% elif pay.status in ['paid', 'pending_verification'] %}
+                            <span class="text-muted">⏳ Awaiting Verification</span>
+                        {% else %}
+                            <span class="text-muted">N/A</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info mt-4">
+        <h4>📭 No Payment Records</h4>
+        <p>You don't have any payment records yet. Once your room is allocated, payment details will appear here.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

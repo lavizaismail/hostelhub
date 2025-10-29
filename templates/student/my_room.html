@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}My Room Details{% endblock %}
+{% block content %}
+<h1 class="page-title animate__animated animate__fadeInDown">Current Room Information</h1>
+
+{% if allocation %}
+<div class="card animate__animated animate__fadeInUp">
+  <h2>{{ allocation.room.block }} - Room {{ allocation.room.roomnumber }}</h2>
+  <p><strong>Floor:</strong> {{ allocation.room.floor }}</p>
+  <p><strong>Status:</strong> {{ allocation.room.status | capitalize }}</p>
+  <p><strong>Monthly Rent:</strong> ₹ {{ allocation.room.monthly_rent | round(2) }}</p>
+  <p><strong>Amenities:</strong></p>
+  <ul>
+    {% if allocation.room.amenities %}
+      {% for amenity in allocation.room.amenities.split(',') %}
+        <li>{{ amenity.strip() }}</li>
+      {% endfor %}
+    {% else %}
+      <li>No amenities listed</li>
+    {% endif %}
+  </ul>
+</div>
+{% else %}
+<p>You do not currently have an allocated room.</p>
+{% endif %}
+{% endblock %}

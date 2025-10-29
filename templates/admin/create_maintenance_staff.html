@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block title %}Create Maintenance Staff - HostelHub{% endblock %}
+
+{% block content %}
+<h1 class="page-title animate__animated animate__fadeInDown">🔧 Create Maintenance Staff</h1>
+
+<div class="info-banner">
+  <p>📊 <strong>Current Maintenance Staff:</strong> {{ maintenance_count }} accounts</p>
+</div>
+
+<div class="card animate__animated animate__fadeInUp">
+  <form method="POST" class="staff-form">
+    <div class="form-group">
+      <label for="username" class="form-label">Username <span class="text-danger">*</span></label>
+      <input type="text" id="username" name="username" class="form-control" 
+             placeholder="e.g., john_maintenance" required>
+      <small class="form-text">Unique username for login</small>
+    </div>
+    
+    <div class="form-group">
+      <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+      <input type="email" id="email" name="email" class="form-control" 
+             placeholder="e.g., john@hostelhub.com" required>
+      <small class="form-text">Will be used for notifications</small>
+    </div>
+    
+    <div class="form-group">
+      <label for="full_name" class="form-label">Full Name (Optional)</label>
+      <input type="text" id="full_name" name="full_name" class="form-control" 
+             placeholder="e.g., John Smith">
+    </div>
+    
+    <div class="form-group">
+      <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+      <input type="text" id="password" name="password" class="form-control" 
+             value="maintenance123" required>
+      <small class="form-text">Default: maintenance123 (can be changed later)</small>
+    </div>
+    
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        ✅ Create Staff Account
+      </button>
+      <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">
+        ← Back to Dashboard
+      </a>
+    </div>
+  </form>
+</div>
+
+<div class="tips-section">
+  <h3>💡 Tips</h3>
+  <ul>
+    <li>Create multiple maintenance staff for different shifts or specializations</li>
+    <li>Staff can be assigned specific complaints by wardens</li>
+    <li>Each staff member can track their assigned complaints</li>
+    <li>You can deactivate staff accounts from the Users page</li>
+  </ul>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.info-banner {
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.08), rgba(139, 92, 246, 0.08));
+  padding: 1.25rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  border-left: 4px solid var(--primary-color);
+}
+
+.info-banner p {
+  margin: 0;
+  font-size: 1.0625rem;
+}
+
+.staff-form {
+  max-width: 600px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.tips-section {
+  margin-top: 3rem;
+  background: var(--surface-color);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px var(--shadow);
+}
+
+.tips-section h3 {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.tips-section ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.tips-section li {
+  margin: 0.75rem 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+</style>
+{% endblock %}

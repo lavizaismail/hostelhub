@@ -1,0 +1,306 @@
+{% extends 'base.html' %}
+
+{% block title %}Accountant Dashboard - HostelHub{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1>💰 Accountant Dashboard</h1>
+    <p>Manage financial transactions and verify payments</p>
+</div>
+
+<!-- Quick Actions Card Grid -->
+<div class="card-grid">
+    <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="stat-icon">💳</div>
+        <div class="stat-info">
+            <h3>Pending Verification</h3>
+            <p class="stat-number">{{ pending_count }}</p>
+        </div>
+        <a href="{{ url_for('accountant.pending_payments') }}" class="card-link">Review →</a>
+    </div>
+
+    <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+        <div class="stat-icon">✅</div>
+        <div class="stat-info">
+            <h3>Verified Payments</h3>
+            <p class="stat-number">{{ verified_count }}</p>
+        </div>
+        <a href="{{ url_for('accountant.payment_history') }}" class="card-link">View →</a>
+    </div>
+
+    <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+        <div class="stat-icon">📊</div>
+        <div class="stat-info">
+            <h3>Total Revenue</h3>
+            <p class="stat-number">₹{{ (total_revenue | default(0)) | round(2) }}</p>
+        </div>
+        <a href="{{ url_for('accountant.payment_history') }}" class="card-link">View →</a>
+    </div>
+
+    <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-info">
+            <h3>Outstanding</h3>
+            <p class="stat-number">₹{{ (outstanding_amount | default(0)) | round(2) }}</p>
+        </div>
+        <a href="{{ url_for('accountant.pending_payments') }}" class="card-link">Track →</a>
+    </div>
+</div>
+
+<!-- Recent Payments Table -->
+<div class="content-card" id="verified-section" style="margin-top: 2rem;">
+    <h2>📋 Recent Payment Transactions</h2>
+    
+    <!-- Filter Tabs -->
+    <div class="filter-tabs" style="margin-bottom: 1rem;">
+        <a href="?status=all" class="tab {% if not request.args.get('status') or request.args.get('status') == 'all' %}active{% endif %}">All</a>
+        <a href="?status=pending_verification" class="tab {% if request.args.get('status') == 'pending_verification' %}active{% endif %}">Pending</a>
+        <a href="?status=verified" class="tab {% if request.args.get('status') == 'verified' %}active{% endif %}">Verified</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Payment ID</th>
+                    <th>Student</th>
+                    <th>Amount</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if payments %}
+                    {% for payment in payments %}
+                    <tr>
+                        <td><strong>#{{ payment.paymentid }}</strong></td>
+                        <td>{{ payment.student.name }}</td>
+                        <td><strong>₹{{ payment.amount | round(2) }}</strong></td>
+                        <td><span class="badge badge-info">{{ payment.payment_type.replace('_', ' ') | capitalize }}</span></td>
+                        <td>
+                            {% if payment.status == 'verified' %}
+                                <span class="badge badge-success">Verified</span>
+                            {% elif payment.status == 'pending_verification' %}
+                                <span class="badge badge-warning">Pending</span>
+                            {% else %}
+                                <span class="badge badge-secondary">{{ payment.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ payment.created_at.strftime('%d %b %Y') if payment.created_at else 'N/A' }}</td>
+                        <td>
+                            {% if payment.status == 'pending_verification' %}
+                                <a href="{{ url_for('accountant.review_payment', payment_id=payment.paymentid) }}" class="btn btn-sm btn-primary">Review</a>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">No payments found</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+.dashboard-header {
+    margin-bottom: 2rem;
+}
+
+.dashboard-header h1 {
+    font-size: 2rem;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-header p {
+    color: #7f8c8d;
+    font-size: 1.1rem;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    padding: 1.5rem;
+    border-radius: 12px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-info h3 {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.card-link {
+    display: inline-block;
+    margin-top: 1rem;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    transition: opacity 0.3s;
+}
+
+.card-link:hover {
+    text-decoration: underline;
+    opacity: 0.8;
+}
+
+.content-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.content-card h2 {
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
+}
+
+.filter-tabs {
+    display: flex;
+    gap: 1rem;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.filter-tabs .tab {
+    padding: 0.75rem 1.5rem;
+    text-decoration: none;
+    color: #666;
+    transition: all 0.3s;
+    border-bottom: 3px solid transparent;
+}
+
+.filter-tabs .tab.active {
+    color: #667eea;
+    border-bottom-color: #667eea;
+    font-weight: 600;
+}
+
+.filter-tabs .tab:hover {
+    color: #667eea;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.data-table thead {
+    background: #f8f9fa;
+}
+
+.data-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #2c3e50;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.data-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.data-table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.badge-success {
+    background: #28a745;
+    color: white;
+}
+
+.badge-warning {
+    background: #ffc107;
+    color: #333;
+}
+
+.badge-info {
+    background: #17a2b8;
+    color: white;
+}
+
+.badge-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s;
+}
+
+.btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.875rem;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: #5568d3;
+}
+
+.text-muted {
+    color: #6c757d;
+}
+
+.text-center {
+    text-align: center;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% block title %}Warden Dashboard - HostelHub{% endblock %}
+
+{% block content %}
+<h1 class="page-title animate__animated animate__fadeInDown">🏨 Warden Control Panel</h1>
+
+<div class="stats-cards animate__animated animate__fadeInUp animate__delay-1s">
+  <div class="card stat-card stat-blue">
+    <div class="stat-icon">🏢</div>
+    <div class="stat-value">{{ total_rooms }}</div>
+    <div class="stat-label">Total Rooms</div>
+  </div>
+
+  <div class="card stat-card stat-green">
+    <div class="stat-icon">✅</div>
+    <div class="stat-value">{{ occupied_rooms }}</div>
+    <div class="stat-label">Occupied Rooms</div>
+  </div>
+
+  <div class="card stat-card stat-orange">
+    <div class="stat-icon">⏳</div>
+    <div class="stat-value">{{ pending_requests }}</div>
+    <div class="stat-label">Pending Requests</div>
+    <a href="{{ url_for('warden.pending_requests') }}" class="btn btn-light btn-sm mt-2">Review Now</a>
+  </div>
+
+  <div class="card stat-card stat-red">
+    <div class="stat-icon">🔧</div>
+    <div class="stat-value">{{ open_complaints }}</div>
+    <div class="stat-label">Open Complaints</div>
+    <a href="{{ url_for('warden.complaints') }}" class="btn btn-light btn-sm mt-2">Manage</a>
+  </div>
+</div>
+
+<div class="dashboard-actions animate__animated animate__fadeInUp animate__delay-2s">
+  <h2 class="section-title">⚡ Quick Actions</h2>
+  <div class="action-grid">
+    <a href="{{ url_for('warden.pending_requests') }}" class="action-card action-warning">
+      <div class="action-icon">📋</div>
+      <h3>Pending Requests</h3>
+      <p>Review and approve room allocations</p>
+    </a>
+    
+    <a href="{{ url_for('warden.complaints') }}" class="action-card action-danger">
+      <div class="action-icon">🔧</div>
+      <h3>All Complaints</h3>
+      <p>Manage and assign complaints</p>
+    </a>
+    
+    <a href="{{ url_for('warden.room_management') }}" class="action-card action-primary">
+      <div class="action-icon">🏢</div>
+      <h3>Room Management</h3>
+      <p>View and manage all rooms</p>
+    </a>
+    
+    <a href="{{ url_for('warden.students') }}" class="action-card action-info">
+      <div class="action-icon">👥</div>
+      <h3>Student List</h3>
+      <p>View all registered students</p>
+    </a>
+  </div>
+</div>
+
+<section class="urgent-section animate__animated animate__fadeInUp animate__delay-3s">
+  <h2 class="section-title">🚨 Urgent Complaints</h2>
+  {% if urgent_complaints %}
+  <div class="urgent-grid">
+    {% for comp in urgent_complaints %}
+    <div class="urgent-item">
+      <div class="urgent-header">
+        <h4>{{ comp.title }}</h4>
+        <span class="badge badge-danger">URGENT</span>
+      </div>
+      <p class="urgent-student">👤 {{ comp.student.name }}</p>
+      <p class="urgent-category">{{ comp.category|capitalize }}</p>
+      <p class="urgent-date">📅 {{ comp.created_at.strftime('%d-%m-%Y') if comp.created_at else '' }}</p>
+      <a href="{{ url_for('warden.complaint_detail', id=comp.complaintid) }}" class="btn btn-danger btn-sm w-100 mt-2">View Details</a>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">✅</div>
+    <p>No urgent complaints at the moment</p>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.section-title {
+  font-size: 1.8rem;
+  color: var(--primary-color);
+  margin: 2rem 0 1.5rem;
+  font-weight: 700;
+}
+
+.stat-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.9;
+}
+
+.stat-blue { background: linear-gradient(135deg, #3B82F6, #2563EB); }
+.stat-green { background: linear-gradient(135deg, #10B981, #059669); }
+.stat-orange { background: linear-gradient(135deg, #F59E0B, #D97706); }
+.stat-red { background: linear-gradient(135deg, #EF4444, #DC2626); }
+
+.btn-light {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-light:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.action-card {
+  background: var(--surface-color);
+  padding: 2rem;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 4px 20px var(--shadow);
+  transition: all 0.3s ease;
+  text-decoration: none;
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.action-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+}
+
+.action-card.action-warning::before { background: linear-gradient(90deg, #F59E0B, #FBBF24); }
+.action-card.action-danger::before { background: linear-gradient(90deg, #EF4444, #F87171); }
+.action-card.action-primary::before { background: linear-gradient(90deg, #4F46E5, #6366F1); }
+.action-card.action-info::before { background: linear-gradient(90deg, #3B82F6, #60A5FA); }
+
+.action-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--primary-color);
+  box-shadow: 0 8px 30px var(--shadow);
+}
+
+.action-icon {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+}
+
+.action-card h3 {
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+  font-size: 1.3rem;
+}
+
+.action-card p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.urgent-section {
+  background: rgba(239, 68, 68, 0.05);
+  padding: 2rem;
+  border-radius: 16px;
+  border: 2px solid var(--danger-color);
+}
+
+.urgent-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.urgent-item {
+  background: var(--surface-color);
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px var(--shadow);
+  border-left: 4px solid var(--danger-color);
+}
+
+.urgent-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.urgent-header h4 {
+  color: var(--danger-color);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.urgent-student, .urgent-category, .urgent-date {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.badge-danger { background: var(--danger-color); color: white; }
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: var(--surface-color);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px var(--shadow);
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+</style>
+{% endblock %}

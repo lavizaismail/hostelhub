@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Room Management{% endblock %}
+{% block content %}
+<h1 class="page-title animate__animated animate__fadeInDown">Room Management</h1>
+
+<table class="table animate__animated animate__fadeInUp">
+  <thead>
+    <tr>
+      <th>Block</th>
+      <th>Room Number</th>
+      <th>Capacity</th>
+      <th>Occupied</th>
+      <th>Gender</th>
+      <th>Status</th>
+      <th>Floor</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for room in rooms %}
+    <tr>
+      <td>{{ room.block }}</td>
+      <td>{{ room.roomnumber }}</td>
+      <td>{{ room.capacity }}</td>
+      <td>{{ room.current_occupancy }}</td>
+      <td>{{ room.gender | capitalize }}</td>
+      <td>{{ room.status | capitalize }}</td>
+      <td>{{ room.floor }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

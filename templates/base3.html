@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}HostelHub{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animate.min.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">🏨 HostelHub</div>
+        <ul class="nav">
+            <li><a href="{{ url_for('index') }}">About</a></li>
+            
+            {% if current_user.is_authenticated %}
+                <li><a href="{{ url_for('profile.view') }}">👤 Profile</a></li>
+                <li><a href="{{ url_for('profile.notifications') }}">🔔
+                    {% set unread_count = current_user.notifications|selectattr('is_read', 'equalto', False)|list|length %}
+                    {% if unread_count > 0 %}
+                        <span class="notification-badge">{{ unread_count }}</span>
+                    {% endif %}
+                </a></li>
+                
+                {% if current_user.role == 'student' %}
+                    <li><a href="{{ url_for('student.dashboard') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('student.request_room') }}">Request Room</a></li>
+                    <li><a href="{{ url_for('student.complaints') }}">My Complaints</a></li>
+                    <li><a href="{{ url_for('student.payments') }}">Payments</a></li>
+                {% elif current_user.role == 'warden' %}
+                    <li><a href="{{ url_for('warden.dashboard') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('warden.pending_requests') }}">Requests</a></li>
+                    <li><a href="{{ url_for('warden.complaints') }}">Complaints</a></li>
+                    <li><a href="{{ url_for('warden.room_management') }}">Rooms</a></li>
+                {% elif current_user.role == 'admin' %}
+                    <li><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('admin.users') }}">Users</a></li>
+                    <li><a href="{{ url_for('admin.rooms') }}">Rooms</a></li>
+                    <li><a href="{{ url_for('admin.complaints') }}">Complaints</a></li>
+                    <li><a href="{{ url_for('admin.reports') }}">Reports</a></li>
+                {% elif current_user.role == 'accountant' %}
+                    <li><a href="{{ url_for('accountant.dashboard') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('accountant.pending_payments') }}">Pending Payments</a></li>
+                {% elif current_user.role == 'maintenance' %}
+                    <li><a href="{{ url_for('maintenance.dashboard') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('maintenance.all_complaints') }}">All Complaints</a></li>
+                {% endif %}
+                
+                <li><a href="{{ url_for('auth.logout') }}">Logout ({{ current_user.username }})</a></li>
+            {% else %}
+                <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+                <li><a href="{{ url_for('auth.register') }}">Register</a></li>
+            {% endif %}
+            
+            <!-- THEME TOGGLE BUTTON - THIS WAS MISSING! -->
+            <li><button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">🌙</button></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

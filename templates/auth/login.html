@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% block title %}Login - HostelHub{% endblock %}
+
+{% block content %}
+<div class="login-wrapper">
+  <div class="login-card animate__animated animate__fadeInUp">
+    <div class="login-header">
+      <h1>🏨 Welcome Back!</h1>
+      <p>Sign in to HostelHub</p>
+    </div>
+
+    <form method="POST" class="login-form" id="loginForm">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" class="form-control" 
+               placeholder="Enter your username" required autofocus>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" class="form-control" 
+               placeholder="Enter your password" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">🔐 Sign In</button>
+    </form>
+
+    <div class="login-footer">
+      <p>Don't have an account? <a href="{{ url_for('auth.register') }}">Register as Student</a></p>
+    </div>
+
+    <!-- Quick Login Section - FIXED: Removed "Demo Only" and "Remove in production" -->
+    <div class="quick-login-section">
+      <p class="quick-title">⚡ Quick Access</p>
+      <div class="quick-grid">
+        <button type="button" class="quick-btn admin-color" onclick="quickLogin('admin', 'admin123')">
+          <span class="emoji">🔐</span>
+          <span class="text">Admin</span>
+        </button>
+        <button type="button" class="quick-btn warden-color" onclick="quickLogin('warden', 'warden123')">
+          <span class="emoji">🏨</span>
+          <span class="text">Warden</span>
+        </button>
+        <button type="button" class="quick-btn accountant-color" onclick="quickLogin('accountant', 'accountant123')">
+          <span class="emoji">💰</span>
+          <span class="text">Accountant</span>
+        </button>
+        <button type="button" class="quick-btn maintenance-color" onclick="quickLogin('maintenance', 'maintenance123')">
+          <span class="emoji">🔧</span>
+          <span class="text">Maintenance</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.login-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.05), rgba(139, 92, 246, 0.05));
+}
+
+.login-card {
+  background: var(--surface-color);
+  padding: 2rem 2.5rem;
+  border-radius: 24px;
+  box-shadow: 0 10px 40px var(--shadow);
+  max-width: 420px;
+  width: 100%;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-header h1 {
+  font-size: 1.75rem;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+  font-weight: 800;
+}
+
+.login-header p {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.login-form {
+  margin-bottom: 1.5rem;
+}
+
+.login-footer {
+  text-align: center;
+  padding-top: 1.25rem;
+  border-top: 2px solid var(--border-color);
+  margin-top: 1.5rem;
+}
+
+.login-footer a {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+/* Quick Login - FIXED */
+.quick-login-section {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: rgba(79, 70, 229, 0.03);
+  border-radius: 12px;
+  border: 1px dashed rgba(79, 70, 229, 0.2);
+}
+
+.quick-title {
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 0.75rem;
+}
+
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.quick-btn {
+  padding: 0.625rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 600;
+  font-size: 0.75rem;
+  color: white;
+}
+
+.quick-btn:hover {
+  transform: scale(1.05);
+}
+
+.quick-btn .emoji {
+  font-size: 1.25rem;
+}
+
+.admin-color { background: linear-gradient(135deg, #EF4444, #DC2626); }
+.warden-color { background: linear-gradient(135deg, #F59E0B, #D97706); }
+.accountant-color { background: linear-gradient(135deg, #10B981, #059669); }
+.maintenance-color { background: linear-gradient(135deg, #8B5CF6, #7C3AED); }
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 1.5rem;
+  }
+  
+  .quick-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function quickLogin(username, password) {
+  document.getElementById('username').value = username;
+  document.getElementById('password').value = password;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,329 @@
+{% extends 'base.html' %}
+{% block title %}About - HostelHub{% endblock %}
+
+{% block content %}
+<div class="about-hero">
+  <h1 class="animate__animated animate__fadeInDown">About HostelHub</h1>
+  <p class="animate__animated animate__fadeInUp">A Complete Hostel Management System for Modern Living</p>
+</div>
+
+<section class="about-content">
+  <div class="about-grid">
+    <div class="about-text">
+      <h2>🎯 What is HostelHub?</h2>
+      <p><strong>HostelHub</strong> is a comprehensive <strong>Hostel Management System</strong> developed to digitize and streamline hostel operations. It serves as a centralized platform connecting students, wardens, administrators, accountants, and maintenance staff for efficient hostel management.</p>
+      
+      <h2>🏆 Our Mission</h2>
+      <p>To transform traditional hostel management into a seamless digital experience through innovative technology, making life easier for students and administrators while ensuring transparency, efficiency, and accountability in all hostel operations.</p>
+      
+      <h2>💡 Why HostelHub?</h2>
+      <p>This <strong>Hostel Management System</strong> was developed to address common challenges in hostel administration:</p>
+      <ul>
+        <li>✅ Eliminate paperwork and manual record-keeping</li>
+        <li>✅ Automate room allocation and approval workflows</li>
+        <li>✅ Track complaints with priority-based resolution</li>
+        <li>✅ Manage payments with digital receipts</li>
+        <li>✅ Provide role-based access for security</li>
+        <li>✅ Generate real-time reports and analytics</li>
+        <li>✅ Enable 24/7 accessibility from anywhere</li>
+      </ul>
+      
+      <h2>👥 Who Uses HostelHub?</h2>
+      <p>This Hostel Management System is designed for multiple user roles:</p>
+      <ul>
+        <li><strong>🎓 Students:</strong> Request rooms, lodge complaints, track payments, and manage their hostel life</li>
+        <li><strong>🏨 Wardens:</strong> Approve room allocations, assign complaints, and oversee daily operations</li>
+        <li><strong>🔐 Administrators:</strong> Full system control, user management, and system configuration</li>
+        <li><strong>💰 Accountants:</strong> Verify payments, track finances, and generate revenue reports</li>
+        <li><strong>🔧 Maintenance Staff:</strong> Receive work orders, update complaint status, and resolve issues</li>
+      </ul>
+      
+      <h2>🌟 Key Features</h2>
+      <p>HostelHub offers comprehensive features across all modules:</p>
+      <ul>
+        <li><strong>Smart Room Management:</strong> Real-time availability tracking with automated allocation</li>
+        <li><strong>Complaint System:</strong> Priority-based tracking from lodging to resolution</li>
+        <li><strong>Payment Portal:</strong> Digital payment processing with automated receipt generation</li>
+        <li><strong>Analytics Dashboard:</strong> Occupancy rates, revenue tracking, and performance metrics</li>
+        <li><strong>Audit Logging:</strong> Complete activity tracking for accountability</li>
+        <li><strong>Responsive Design:</strong> Works seamlessly on desktop, tablet, and mobile devices</li>
+        <li><strong>Theme Support:</strong> Beautiful dark and light themes for comfortable viewing</li>
+      </ul>
+      
+      <h2>🚀 Technology Stack</h2>
+      <p>Built with modern, reliable technologies:</p>
+      <ul>
+        <li><strong>Backend:</strong> Python Flask Framework</li>
+        <li><strong>Database:</strong> SQLAlchemy ORM with SQLite/PostgreSQL</li>
+        <li><strong>Frontend:</strong> HTML5, CSS3, JavaScript with Animate.css</li>
+        <li><strong>Authentication:</strong> Flask-Login with secure password hashing</li>
+        <li><strong>File Handling:</strong> Werkzeug for secure file uploads</li>
+      </ul>
+    </div>
+    
+    <div class="about-stats">
+      <div class="stat-card-v2">
+        <div class="icon">🏢</div>
+        <h3>Modern Infrastructure</h3>
+        <p>Built with latest web technologies and best practices</p>
+      </div>
+      <div class="stat-card-v2">
+        <div class="icon">🔐</div>
+        <h3>Secure & Private</h3>
+        <p>Your data is encrypted, protected, and always safe</p>
+      </div>
+      <div class="stat-card-v2">
+        <div class="icon">📱</div>
+        <h3>Responsive Design</h3>
+        <p>Works beautifully on all devices and screen sizes</p>
+      </div>
+      <div class="stat-card-v2">
+        <div class="icon">⚡</div>
+        <h3>Lightning Fast</h3>
+        <p>Optimized performance for instant response times</p>
+      </div>
+      <div class="stat-card-v2">
+        <div class="icon">🎨</div>
+        <h3>Beautiful UI</h3>
+        <p>Modern, intuitive interface with stunning visuals</p>
+      </div>
+      <div class="stat-card-v2">
+        <div class="icon">🌍</div>
+        <h3>Always Available</h3>
+        <p>24/7 access from anywhere in the world</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="contact-section">
+  <h2 class="section-title">📧 Contact Us & Rate Our Service</h2>
+  
+  <form method="POST" action="{{ url_for('contact') }}" class="contact-form">
+    <div class="form-row">
+      <div class="form-group">
+        <label for="name">Your Name</label>
+        <input type="text" id="name" name="name" class="form-control" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" class="form-control" required>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label for="message">Message</label>
+      <textarea id="message" name="message" rows="5" class="form-control" placeholder="Tell us what you think about HostelHub..." required></textarea>
+    </div>
+    
+    <div class="form-group">
+      <label>Rate Our Hostel Management System</label>
+      <div class="rating-stars">
+        <input type="radio" name="rating" value="5" id="star5"><label for="star5">⭐</label>
+        <input type="radio" name="rating" value="4" id="star4"><label for="star4">⭐</label>
+        <input type="radio" name="rating" value="3" id="star3" checked><label for="star3">⭐</label>
+        <input type="radio" name="rating" value="2" id="star2"><label for="star2">⭐</label>
+        <input type="radio" name="rating" value="1" id="star1"><label for="star1">⭐</label>
+      </div>
+    </div>
+    
+    <button type="submit" class="btn btn-primary btn-lg w-100">Send Message 📨</button>
+  </form>
+</section>
+
+<section class="team-section">
+  <h2 class="section-title">💼 Developed By</h2>
+  <div class="team-card">
+    <p><strong>HostelHub</strong> is a student project developed as a comprehensive Hostel Management System to showcase modern web development practices and solve real-world hostel administration challenges.</p>
+    <p class="mt-3"><strong>Version:</strong> 1.0.0 | <strong>Release Date:</strong> October 2025</p>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.about-hero {
+  text-align: center;
+  padding: 5rem 2rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: white;
+  border-radius: 20px;
+  margin-bottom: 3rem;
+}
+
+.about-hero h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  font-weight: 900;
+}
+
+.about-hero p {
+  font-size: 1.3rem;
+  opacity: 0.95;
+}
+
+.about-content {
+  padding: 3rem 0;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 3rem;
+}
+
+.about-text h2 {
+  color: var(--primary-color);
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.about-text p {
+  line-height: 1.8;
+  font-size: 1.05rem;
+  margin-bottom: 1rem;
+}
+
+.about-text ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.about-text li {
+  padding: 0.6rem 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.about-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.stat-card-v2 {
+  background: var(--surface-color);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px var(--shadow);
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.stat-card-v2:hover {
+  transform: translateY(-5px);
+  border-color: var(--primary-color);
+}
+
+.stat-card-v2 .icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.stat-card-v2 h3 {
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.stat-card-v2 p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.contact-section {
+  padding: 4rem 2rem;
+  background: var(--surface-color);
+  border-radius: 20px;
+  margin-top: 3rem;
+  box-shadow: 0 8px 32px var(--shadow);
+}
+
+.section-title {
+  font-size: 2rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.contact-form {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.rating-stars {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.rating-stars input {
+  display: none;
+}
+
+.rating-stars label {
+  font-size: 2.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  filter: grayscale(100%);
+}
+
+.rating-stars label:hover,
+.rating-stars label:hover ~ label,
+.rating-stars input:checked ~ label {
+  color: #FFD700;
+  filter: grayscale(0%);
+  transform: scale(1.2);
+}
+
+.team-section {
+  margin-top: 3rem;
+}
+
+.team-card {
+  background: var(--surface-color);
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px var(--shadow);
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.team-card p {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--text-color);
+}
+
+.mt-3 {
+  margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  .about-hero h1 {
+    font-size: 2rem;
+  }
+}
+</style>
+{% endblock %}

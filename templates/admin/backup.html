@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Backup & Restore - HostelHub{% endblock %}
+
+{% block content %}
+<h1 class="page-title animate__animated animate__fadeInDown">💾 Backup & Restore</h1>
+
+<!-- Create Backup Section -->
+<div class="content-card animate__animated animate__fadeInUp">
+    <h2>Create New Backup</h2>
+    <p>Create a complete backup of your hostel management database.</p>
+    
+    <form action="{{ url_for('admin.create_backup') }}" method="POST" style="margin-top: 20px;">
+        <button type="submit" class="btn btn-success">
+            <i class="fas fa-plus-circle"></i> Create Backup Now
+        </button>
+    </form>
+</div>
+
+<!-- Available Backups -->
+<div class="content-card animate__animated animate__fadeInUp" style="animation-delay: 0.1s; margin-top: 30px;">
+    <h2>Available Backups</h2>
+    
+    {% if backups %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Backup File</th>
+                        <th>Date Created</th>
+                        <th>Size</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for backup in backups %}
+                    <tr>
+                        <td><strong>{{ backup.filename }}</strong></td>
+                        <td>{{ backup.date }}</td>
+                        <td>{{ backup.size }}</td>
+                        <td>
+                            <a href="{{ url_for('admin.download_backup', filename=backup.filename) }}" 
+                               class="btn btn-sm btn-primary">
+                                <i class="fas fa-download"></i> Download
+                            </a>
+                            
+                            <form action="{{ url_for('admin.restore_backup', filename=backup.filename) }}" 
+                                  method="POST" 
+                                  style="display: inline;"
+                                  onsubmit="return confirm('⚠️ Are you sure you want to restore this backup? Current data will be replaced!');">
+                                <button type="submit" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-undo"></i> Restore
+                                </button>
+                            </form>
+                            
+                            <form action="{{ url_for('admin.delete_backup', filename=backup.filename) }}" 
+                                  method="POST" 
+                                  style="display: inline;"
+                                  onsubmit="return confirm('Are you sure you want to delete this backup?');">
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> No backups available yet. Create your first backup to get started!
+        </div>
+    {% endif %}
+</div>
+
+<!-- Backup Information -->
+<div class="content-card animate__animated animate__fadeInUp" style="animation-delay: 0.2s; margin-top: 30px;">
+    <h2>📖 Backup Information</h2>
+    <ul style="line-height: 2;">
+        <li><strong>Automatic Scheduling:</strong> Currently manual. Set up cron jobs for automatic backups.</li>
+        <li><strong>Retention Policy:</strong> Keep backups for at least 90 days as per SRS requirements.</li>
+        <li><strong>Backup Location:</strong> <code>backups/</code> directory in project root.</li>
+        <li><strong>Safety:</strong> A safety backup is automatically created before each restore operation.</li>
+        <li><strong>Best Practice:</strong> Download important backups to external storage regularly.</li>
+    </ul>
+</div>
+
+{% endblock %}

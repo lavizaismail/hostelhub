@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% block title %}Maintenance Dashboard - HostelHub{% endblock %}
+
+{% block content %}
+<h1 class="page-title animate__animated animate__fadeInDown">🔧 Maintenance Dashboard</h1>
+
+<div class="stats-cards animate__animated animate__fadeInUp animate__delay-1s">
+  <a href="{{ url_for('maintenance.my_assigned') }}" class="card stat-card stat-purple">
+    <div class="stat-icon">📋</div>
+    <div class="stat-value">{{ my_assigned_count }}</div>
+    <div class="stat-label">My Assigned</div>
+  </a>
+
+  <a href="{{ url_for('maintenance.urgent') }}" class="card stat-card stat-orange">
+    <div class="stat-icon">🚨</div>
+    <div class="stat-value">{{ urgent_count }}</div>
+    <div class="stat-label">Urgent Issues</div>
+  </a>
+
+  <a href="{{ url_for('maintenance.resolved') }}" class="card stat-card stat-green">
+    <div class="stat-icon">✅</div>
+    <div class="stat-value">{{ resolved_count }}</div>
+    <div class="stat-label">Resolved</div>
+  </a>
+
+  <a href="{{ url_for('maintenance.complaints') }}" class="card stat-card stat-blue">
+    <div class="stat-icon">📊</div>
+    <div class="stat-value">{{ unassigned_count }}</div>
+    <div class="stat-label">Unassigned</div>
+  </a>
+</div>
+
+<!-- Recent Complaints -->
+<section class="recent-complaints animate__animated animate__fadeInUp animate__delay-2s">
+  <h2 class="section-title">🔧 Recent Assigned Complaints</h2>
+  <div class="card">
+    <div style="overflow-x: auto;">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if my_assigned %}
+            {% for complaint in my_assigned %}
+            <tr>
+              <td><strong>#{{ complaint.complaintid }}</strong></td>
+              <td>{{ complaint.title }}</td>
+              <td><span class="badge badge-info">{{ complaint.category | capitalize }}</span></td>
+              <td>
+                {% if complaint.priority == 'High' %}
+                  <span class="badge badge-danger">High</span>
+                {% elif complaint.priority == 'Medium' %}
+                  <span class="badge badge-warning">Medium</span>
+                {% else %}
+                  <span class="badge badge-success">Low</span>
+                {% endif %}
+              </td>
+              <td><span class="badge badge-warning">{{ complaint.status.replace('_', ' ') | capitalize }}</span></td>
+              <td>{{ complaint.created_at.strftime('%d %b %Y') if complaint.created_at else 'N/A' }}</td>
+              <td>
+                <a href="{{ url_for('maintenance.complaint_detail', id=complaint.complaintid) }}" class="btn btn-sm btn-primary">View</a>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr><td colspan="7" style="text-align: center;">No complaints assigned</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.section-title {
+  font-size: 1.8rem;
+  color: var(--primary-color);
+  margin: 2rem 0 1.5rem;
+  font-weight: 700;
+}
+
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.stats-cards a {
+  text-decoration: none;
+  color: white;
+}
+
+.stat-card {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.stat-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.9;
+}
+
+.stat-orange { background: linear-gradient(135deg, #F59E0B, #D97706); }
+.stat-blue { background: linear-gradient(135deg, #3B82F6, #2563EB); }
+.stat-purple { background: linear-gradient(135deg, #8B5CF6, #7C3AED); }
+.stat-green { background: linear-gradient(135deg, #10B981, #059669); }
+
+.badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.badge-success { background: var(--success-color); color: white; }
+.badge-warning { background: var(--warning-color); color: white; }
+.badge-danger { background: var(--danger-color); color: white; }
+.badge-info { background: var(--info-color); color: white; }
+</style>
+{% endblock %}

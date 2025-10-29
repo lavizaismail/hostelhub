@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Complaint Details - HostelHub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>🔧 Complaint Details</h2>
+    
+    <div class="complaint-card">
+        <h3>{{ complaint.title }}</h3>
+        <p><strong>Category:</strong> {{ complaint.category }}</p>
+        <p><strong>Priority:</strong> <span class="badge-{{ complaint.priority }}">{{ complaint.priority }}</span></p>
+        <p><strong>Status:</strong> <span class="badge-{{ complaint.status }}">{{ complaint.status }}</span></p>
+        <p><strong>Student:</strong> {{ complaint.student.name }}</p>
+        <p><strong>Created:</strong> {{ complaint.created_at.strftime('%d %b %Y, %I:%M %p') }}</p>
+        
+        <div class="description">
+            <strong>Description:</strong>
+            <p>{{ complaint.description }}</p>
+        </div>
+        
+        {% if complaint.attachment_path %}
+        <p><strong>Attachment:</strong> <a href="{{ url_for('static', filename='uploads/' + complaint.attachment_path) }}" target="_blank">View File</a></p>
+        {% endif %}
+        
+        <!-- FORWARD BUTTON - Only show if complaint is 'open' -->
+        {% if complaint.status == 'open' %}
+        <form method="POST" action="{{ url_for('warden.forward_complaint', complaint_id=complaint.complaintid) }}" style="margin-top: 20px;">
+            <button type="submit" class="btn btn-primary" onclick="return confirm('Forward this complaint to maintenance?')">
+                ➡️ Forward to Maintenance
+            </button>
+        </form>
+        {% elif complaint.status == 'forwarded' %}
+        <p class="alert alert-info">✅ This complaint has been forwarded to maintenance</p>
+        {% elif complaint.status == 'staff_assigned' %}
+        <p class="alert alert-success">👷 Staff assigned: {{ complaint.assigned_staff.name }} ({{ complaint.assigned_staff.specialization }})</p>
+        {% elif complaint.status == 'in_progress' %}
+        <p class="alert alert-warning">🔨 Work in progress</p>
+        {% elif complaint.status == 'resolved' %}
+        <p class="alert alert-success">✅ Resolved on {{ complaint.resolved_at.strftime('%d %b %Y') }}</p>
+        {% if complaint.resolution_notes %}
+        <p><strong>Resolution Notes:</strong> {{ complaint.resolution_notes }}</p>
+        {% endif %}
+        {% endif %}
+    </div>
+    
+    <a href="{{ url_for('warden.complaints') }}" class="btn btn-secondary">← Back to Complaints</a>
+</div>
+{% endblock %}

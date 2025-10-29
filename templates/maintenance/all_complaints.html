@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% block title %}{{ page_title }} - Maintenance{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <div class="page-header">
+    <h1>🔧 {{ page_title }}</h1>
+    <a href="{{ url_for('maintenance.dashboard') }}" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
+  </div>
+
+  {% if complaints %}
+  <div class="all-complaints-grid">
+    {% for c in complaints %}
+    <div class="complaint-card">
+      <div class="complaint-card-header">
+        <span class="complaint-id">#{{ c.complaintid }}</span>
+        <span class="status-badge status-{{ c.status.lower().replace(' ', '-') }}">
+          {{ c.status }}
+        </span>
+      </div>
+      <h3>{{ c.title }}</h3>
+      <div class="complaint-details">
+        <p><strong>Description:</strong> {{ c.description }}</p>
+        <p><strong>Room:</strong> {{ c.room.roomnumber }} | <strong>Student:</strong> {{ c.student.name }}</p>
+        <p><strong>Category:</strong> {{ c.category }}</p>
+        <p><strong>Priority:</strong> <span class="priority-badge priority-{{ c.priority.lower() }}">{{ c.priority }}</span></p>
+        <p><strong>Created:</strong> {{ c.created_at.strftime('%d %b %Y, %I:%M %p') }}</p>
+        {% if c.assigned_staff_id %}
+        <p><strong>Assigned To Staff ID:</strong> {{ c.assigned_staff_id }}</p>
+        {% endif %}
+        {% if c.resolution_notes %}
+        <p><strong>Resolution Notes:</strong> {{ c.resolution_notes }}</p>
+        {% endif %}
+      </div>
+      <a href="{{ url_for('maintenance.complaint_detail', id=c.complaintid) }}" class="btn btn-primary btn-sm">
+        View & Update
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <p>✅ No complaints found!</p>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+.dashboard-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.all-complaints-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.complaint-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.complaint-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.complaint-card-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.complaint-id {
+  font-weight: 700;
+  color: #667eea;
+}
+
+.complaint-card h3 {
+  font-size: 1.125rem;
+  margin-bottom: 1rem;
+  color: #1f2937;
+}
+
+.complaint-details {
+  margin: 1rem 0;
+  line-height: 1.6;
+}
+
+.complaint-details p {
+  margin: 0.5rem 0;
+  font-size: 0.9375rem;
+  color: #374151;
+}
+
+.status-badge {
+  padding: 0.375rem 0.875rem;
+  border-radius: 20px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.status-open { background: #FEF3C7; color: #92400E; }
+.status-forwarded { background: #DBEAFE; color: #1E40AF; }
+.status-staff-assigned { background: #E0E7FF; color: #3730A3; }
+.status-in-progress { background: #DBEAFE; color: #1E40AF; }
+.status-resolved { background: #D1FAE5; color: #065F46; }
+
+.priority-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.priority-high { background: #FEE2E2; color: #991B1B; }
+.priority-medium { background: #FEF3C7; color: #92400E; }
+.priority-low { background: #D1FAE5; color: #065F46; }
+
+.btn {
+  display: inline-block;
+  padding: 0.625rem 1.25rem;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9375rem;
+}
+
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #5568d3 0%, #663a8e 100%);
+}
+
+.btn-secondary {
+  background: #6b7280;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #4b5563;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: #6b7280;
+  font-size: 1.25rem;
+}
+
+@media (max-width: 768px) {
+  .all-complaints-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+{% endblock %}

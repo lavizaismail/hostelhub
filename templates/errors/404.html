@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}404 - Page Not Found - HostelHub{% endblock %}
+
+{% block content %}
+<div class="error-page">
+  <div class="error-content animate__animated animate__fadeInUp">
+    <h1 class="error-code">404</h1>
+    <h2>Page Not Found</h2>
+    <p>The page you're looking for doesn't exist or has been moved.</p>
+    <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">🏠 Go Home</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.error-page {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.error-content {
+  max-width: 600px;
+  padding: 3rem;
+  background: var(--surface-color);
+  border-radius: 24px;
+  box-shadow: 0 10px 40px var(--shadow);
+}
+
+.error-code {
+  font-size: 10rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+  line-height: 1;
+}
+
+.error-content h2 {
+  font-size: 2.5rem;
+  color: var(--text-color);
+  margin: 1.5rem 0;
+  font-weight: 700;
+}
+
+.error-content p {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  margin-bottom: 2.5rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .error-code {
+    font-size: 6rem;
+  }
+  
+  .error-content h2 {
+    font-size: 1.75rem;
+  }
+}
+</style>
+{% endblock %}
