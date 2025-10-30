@@ -127,7 +127,7 @@ def complaints():
 def complaint_detail(id):
     complaint = Complaint.query.join(Student).options(
         db.joinedload(Complaint.student)
-    ).filter(Complaint.id == id).first_or_404()
+    ).filter(Complaint.complaintid == id).first_or_404()  # ✅ CORRECT
 
 
 # NEW: Forward complaint to maintenance (single button)
@@ -172,7 +172,7 @@ def room_management():
 @warden_required
 def students():
     students = Student.query.options(
-        db.joinedload(Student.rooms)
+        db.joinedload(Student.allocations)
     ).all()
     return render_template('warden/students.html', students=students)
 
