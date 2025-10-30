@@ -52,13 +52,9 @@ class Student(db.Model):
     fullname = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.String(15))
     email = db.Column(db.String(100))
-    guardianname = db.Column(db.String(100))
-    guardianphone = db.Column(db.String(15))
     address = db.Column(db.Text)
     year = db.Column(db.Integer)
     course = db.Column(db.String(100))  # ← ADD THIS LINE!
-    department = db.Column(db.String(100))
-    dateofbirth = db.Column(db.Date)
     gender = db.Column(db.String(10))
     enrollmentdate = db.Column(db.DateTime, default=datetime.utcnow)
     
@@ -67,6 +63,7 @@ class Student(db.Model):
     allocations = db.relationship('RoomAllocation', backref='student', lazy=True)
     payments = db.relationship('Payment', backref='student', lazy=True)
     complaints = db.relationship('Complaint', backref='student', lazy=True)
+    rooms = db.relationship('Room', secondary='room_allocations', backref='students', lazy=True)
 
 # ============= ROOM TABLE =============
 class Room(db.Model):

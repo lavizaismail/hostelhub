@@ -116,16 +116,19 @@ def reject_request(allocation_id):
 @login_required
 @warden_required
 def complaints():
-    # Show all complaints
-    complaints = Complaint.query.order_by(Complaint.created_at.desc()).all()
+    complaints = Complaint.query.join(Student).options(
+        db.joinedload(Complaint.student)
+    ).order_by(Complaint.created_at.desc()).all()
     return render_template('warden/complaints.html', complaints=complaints)
 
 @warden_bp.route('/complaint/<int:id>')
 @login_required
 @warden_required
 def complaint_detail(id):
-    complaint = Complaint.query.get_or_404(id)
-    return render_template('warden/complaint_detail.html', complaint=complaint)
+    complaint = Complaint.query.join(Student).options(
+        db.joinedload(Complaint.student)
+    ).filter(Complaint.id == id).first_or_404()
+
 
 # NEW: Forward complaint to maintenance (single button)
 @warden_bp.route('/forward-complaint/<int:complaint_id>', methods=['POST'])
@@ -168,5 +171,8 @@ def room_management():
 @login_required
 @warden_required
 def students():
-    students = Student.query.all()
+    students = Student.query.options(
+        db.joinedload(Student.rooms)
+    ).all()
     return render_template('warden/students.html', students=students)
+
