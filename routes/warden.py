@@ -128,7 +128,7 @@ def complaint_detail(id):
     complaint = Complaint.query.join(Student).options(
         db.joinedload(Complaint.student)
     ).filter(Complaint.complaintid == id).first_or_404()  # ✅ CORRECT
-
+    return render_template('warden/complaint_detail.html', complaint=complaint)
 
 # NEW: Forward complaint to maintenance (single button)
 @warden_bp.route('/forward-complaint/<int:complaint_id>', methods=['POST'])
@@ -136,7 +136,6 @@ def complaint_detail(id):
 @warden_required
 def forward_complaint(complaint_id):
     complaint = Complaint.query.get_or_404(complaint_id)
-    
     if complaint.status != 'open':
         flash('This complaint has already been forwarded', 'warning')
         return redirect(url_for('warden.complaints'))

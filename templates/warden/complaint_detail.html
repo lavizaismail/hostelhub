@@ -10,7 +10,7 @@
         <p><strong>Category:</strong> {{ complaint.category }}</p>
         <p><strong>Priority:</strong> <span class="badge-{{ complaint.priority }}">{{ complaint.priority }}</span></p>
         <p><strong>Status:</strong> <span class="badge-{{ complaint.status }}">{{ complaint.status }}</span></p>
-        <p><strong>Student:</strong> {{ complaint.student.name }}</p>
+        <p><strong>Student:</strong> {{ complaint.student.fullname }}</p>
         <p><strong>Created:</strong> {{ complaint.created_at.strftime('%d %b %Y, %I:%M %p') }}</p>
         
         <div class="description">

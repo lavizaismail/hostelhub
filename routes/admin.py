@@ -196,21 +196,26 @@ def room_edit(room_id):
 def complaints():
     status = request.args.get('status', None)
     priority = request.args.get('priority', None)
-    query = Complaint.query
+    query = Complaint.query.join(Student)
     
     if status:
         query = query.filter_by(status=status)
     if priority:
         query = query.filter_by(priority=priority)
     
-    complaints = query.order_by(Complaint.created_at.desc()).all()
+    complaints = query.options(
+        db.joinedload(Complaint.student)
+    ).order_by(Complaint.created_at.desc()).all()
+    
     return render_template('admin/complaints.html', complaints=complaints)
 
 @admin_bp.route('/complaint/<int:complaint_id>')
 @login_required
 @admin_required
 def complaint_detail(complaint_id):
-    complaint = Complaint.query.get_or_404(complaint_id)
+    complaint = Complaint.query.join(Student).options(
+        db.joinedload(Complaint.student)
+    ).filter(Complaint.complaintid == complaint_id).first_or_404()
     
     # Get all active maintenance staff
     maintenance_staff = User.query.filter_by(

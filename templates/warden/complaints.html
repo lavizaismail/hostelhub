@@ -40,7 +40,7 @@
     {% for c in complaints %}
     <tr>
       <td>{{ c.title }}</td>
-      <td>{{ c.student.name }}</td>
+      <td>{{ c.student.fullname }}</td>
       <td>{{ c.status|capitalize }}</td>
       <td>{{ c.priority|capitalize }}</td>
       <td>{{ c.created_at.strftime('%d-%m-%Y') if c.created_at else '' }}</td>

@@ -49,7 +49,7 @@
     <tr>
       <td>#{{ c.complaintid }}</td>
       <td>{{ c.title }}</td>
-      <td>{{ c.student.name }}</td>
+      <td>{{ c.student.fullname }}</td>
       <td><span class="badge badge-info">{{ c.category | capitalize }}</span></td>
       <td><span class="badge badge-{{ 'success' if c.status == 'resolved' else 'warning' }}">{{ c.status | capitalize }}</span></td>
       <td><span class="badge badge-{{ 'danger' if c.priority == 'urgent' else 'secondary' }}">{{ c.priority | capitalize }}</span></td>
