@@ -36,7 +36,7 @@
         {% elif complaint.status == 'in_progress' %}
         <p class="alert alert-warning">🔨 Work in progress</p>
         {% elif complaint.status == 'resolved' %}
-        <p class="alert alert-success">✅ Resolved on {{ complaint.resolved_at.strftime('%d %b %Y') }}</p>
+        <p class="alert alert-success">✅ Resolved on {{ complaint.resolvedat.strftime('%d %b %Y') }}</p>
         {% if complaint.resolution_notes %}
         <p><strong>Resolution Notes:</strong> {{ complaint.resolution_notes }}</p>
         {% endif %}
