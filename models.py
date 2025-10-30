@@ -63,7 +63,6 @@ class Student(db.Model):
     allocations = db.relationship('RoomAllocation', backref='student', lazy=True)
     payments = db.relationship('Payment', backref='student', lazy=True)
     complaints = db.relationship('Complaint', backref='student', lazy=True)
-    rooms = db.relationship('Room', secondary='room_allocations', backref='students', lazy=True)
 
 # ============= ROOM TABLE =============
 class Room(db.Model):

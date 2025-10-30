@@ -30,7 +30,7 @@
                             <td>{{ student.gender.title() if student.gender else 'Not Set' }}</td>
                             <td>{{ student.phone if student.phone else 'N/A' }}</td>
                             <td>
-                                {% set allocated_rooms = student.rooms|selectattr('status','equalto','allocated')|list %}
+                                {% set allocated_rooms = student.allocations|selectattr('status','equalto','allocated')|list %}
                                 {% if allocated_rooms|length > 0 %}
                                     <span class="badge bg-success">✅ ALLOCATED</span>
                                 {% else %}
